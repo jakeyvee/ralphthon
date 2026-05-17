@@ -25,6 +25,7 @@ export const env = {
   elevenlabs: {
     apiKey: process.env.ELEVENLABS_API_KEY,
     agentId: process.env.ELEVENLABS_AGENT_ID,
+    agentPhoneNumberId: process.env.ELEVENLABS_AGENT_PHONE_NUMBER_ID,
   },
   telegram: {
     botToken: process.env.TELEGRAM_BOT_TOKEN,
