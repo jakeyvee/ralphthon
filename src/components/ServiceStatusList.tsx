@@ -13,12 +13,12 @@ export function ServiceStatusList({ status }: { status: ServiceStatusMap }) {
     [keyof ServiceStatusMap, ServiceStatusMap[keyof ServiceStatusMap]]
   >;
   return (
-    <ul className="divide-y divide-zinc-800">
+    <ul className="divide-y divide-[#E5E7EB]">
       {entries.map(([key, value], idx) => (
         <li
           key={key}
           className={`flex items-start gap-3 px-1 py-2.5 ${
-            idx === 0 ? "" : "border-t border-zinc-800"
+            idx === 0 ? "" : "border-t border-[#E5E7EB]"
           }`}
         >
           <span
@@ -29,19 +29,19 @@ export function ServiceStatusList({ status }: { status: ServiceStatusMap }) {
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm font-medium text-white">
+              <span className="text-sm font-medium text-[#111827]">
                 {LABELS[key]}
               </span>
               <span
                 className={`font-mono text-[11px] uppercase tracking-wider font-semibold ${
-                  value.configured ? "text-emerald-400" : "text-amber-400"
+                  value.configured ? "text-emerald-700" : "text-amber-700"
                 }`}
               >
                 {value.configured ? "Configured" : "Not configured"}
               </span>
             </div>
             {!value.configured && value.reason ? (
-              <p className="mt-0.5 truncate text-xs text-zinc-500">
+              <p className="mt-0.5 truncate text-xs text-[#4B5563]">
                 {value.reason}
               </p>
             ) : null}

@@ -129,8 +129,8 @@ export function HandoffResources({
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
-      <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+    <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
+      <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
         AIC / SAGE handoff resources
       </h3>
 
@@ -138,20 +138,20 @@ export function HandoffResources({
         {(Object.values(RESOURCES) as Resource[]).map((r) => (
           <div
             key={r.key}
-            className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
+            className="rounded-xl border border-[#E5E7EB] bg-white p-3"
           >
-            <p className="text-sm font-semibold text-white">{r.name}</p>
-            <p className="mt-1 text-xs text-zinc-400">{r.purpose}</p>
+            <p className="text-sm font-semibold text-[#111827]">{r.name}</p>
+            <p className="mt-1 text-xs text-[#4B5563]">{r.purpose}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
               <a
                 href={r.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-[#818CF8] hover:underline"
+                className="font-medium text-[#E65C00] hover:underline"
               >
                 {r.url.replace(/^https?:\/\//, "")}
               </a>
-              <span className="text-zinc-500">Tel: {r.phone}</span>
+              <span className="text-[#4B5563]">Tel: {r.phone}</span>
             </div>
           </div>
         ))}
@@ -159,7 +159,7 @@ export function HandoffResources({
 
       <div className="mt-4 space-y-2">
         {eventRows.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-zinc-800 bg-[#0E0E10] p-3 text-center text-xs text-zinc-500">
+          <p className="rounded-xl border border-dashed border-[#E5E7EB] bg-white p-3 text-center text-xs text-[#4B5563]">
             No trigger events yet — handoff actions will appear here when rules fire.
           </p>
         ) : (
@@ -169,25 +169,25 @@ export function HandoffResources({
             return (
               <div
                 key={event.id}
-                className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
+                className="flex flex-wrap items-start justify-between gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-white">
+                  <p className="text-sm font-semibold text-[#111827]">
                     {event.rule_name}
                   </p>
-                  <p className="mt-0.5 text-xs text-zinc-500">
+                  <p className="mt-0.5 text-xs text-[#4B5563]">
                     {formatSgt(event.timestamp_sgt)} · matched resource{" "}
-                    <span className="inline-flex items-center rounded-full border border-[#F472B6]/50 bg-transparent px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#F472B6]">
+                    <span className="inline-flex items-center rounded-full border border-[#FFB380] bg-[#FFB380]/30 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-[#9A3412]">
                       {resource.key}
                     </span>
                   </p>
-                  <p className="mt-1 truncate text-xs text-zinc-400">
+                  <p className="mt-1 truncate text-xs text-[#4B5563]">
                     &ldquo;{event.context_excerpt}&rdquo;
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {done ? (
-                    <span className="inline-flex items-center rounded-full border border-[#818CF8]/40 bg-[#818CF8]/15 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#818CF8]">
+                    <span className="inline-flex items-center rounded-full border border-[#E65C00]/40 bg-[#E65C00]/10 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#E65C00]">
                       Handoff logged · {formatSgt(done.timestamp_sgt)}
                     </span>
                   ) : (
@@ -195,7 +195,7 @@ export function HandoffResources({
                       type="button"
                       disabled={isPending}
                       onClick={() => handleMark(event, resource, note)}
-                      className="rounded-md border border-zinc-800 bg-transparent px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800/50 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-md border border-[#E5E7EB] bg-white px-2 py-1 text-xs font-medium text-[#4B5563] hover:bg-[#F7F4EB] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isPending ? "Saving..." : "Mark handoff considered"}
                     </button>
@@ -203,7 +203,7 @@ export function HandoffResources({
                   <button
                     type="button"
                     onClick={() => handleCopy(note)}
-                    className="rounded-md border border-zinc-800 bg-transparent px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800/50"
+                    className="rounded-md border border-[#E5E7EB] bg-white px-2 py-1 text-xs font-medium text-[#4B5563] hover:bg-[#F7F4EB]"
                   >
                     Copy handoff note
                   </button>
@@ -215,12 +215,12 @@ export function HandoffResources({
       </div>
 
       {toast ? (
-        <p className="mt-3 inline-block rounded-md border border-[#818CF8]/40 bg-[#818CF8]/15 px-2 py-1 text-xs text-[#818CF8]">
+        <p className="mt-3 inline-block rounded-md border border-[#E65C00]/40 bg-[#E65C00]/10 px-2 py-1 text-xs text-[#9A3412]">
           {toast}
         </p>
       ) : null}
 
-      <p className="mt-3 text-xs text-zinc-500">
+      <p className="mt-3 text-xs text-[#4B5563]">
         Resource links only — not an automated clinical referral.
       </p>
     </div>

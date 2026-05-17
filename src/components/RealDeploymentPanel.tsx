@@ -23,15 +23,15 @@ type CallState =
 const MODE_PILL: Record<ReadinessMode, { label: string; classes: string }> = {
   simulator: {
     label: "Simulator",
-    classes: "border-zinc-700 bg-zinc-800 text-zinc-300",
+    classes: "border-[#E5E7EB] bg-[#E5E7EB] text-[#4B5563]",
   },
   "test-call": {
     label: "Test call",
-    classes: "border-amber-500/40 bg-amber-500/15 text-amber-300",
+    classes: "border-amber-300 bg-amber-100 text-amber-800",
   },
   "real-elder": {
     label: "Real elder call",
-    classes: "border-[#F472B6]/40 bg-[#F472B6]/15 text-[#F472B6]",
+    classes: "border-[#E65C00]/40 bg-[#E65C00]/15 text-[#E65C00]",
   },
 };
 
@@ -109,15 +109,15 @@ export function RealDeploymentPanel({
   const pill = MODE_PILL[readiness.mode];
   const isReal = readiness.mode === "real-elder";
   const containerBorder = isReal
-    ? "border-[#F472B6]/60"
-    : "border-zinc-800";
+    ? "border-[#E65C00]/60"
+    : "border-[#E5E7EB]";
 
   return (
     <section
-      className={`rounded-2xl border bg-[#18181C] p-6 shadow-none ${containerBorder}`}
+      className={`rounded-2xl border bg-[#F7F4EB] p-6 shadow-sm ${containerBorder}`}
     >
       <header className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
           Deployment mode
         </h3>
         <span
@@ -126,10 +126,10 @@ export function RealDeploymentPanel({
           <span
             className={`h-1.5 w-1.5 rounded-full ${
               readiness.mode === "real-elder"
-                ? "bg-[#F472B6]"
+                ? "bg-[#E65C00]"
                 : readiness.mode === "test-call"
                   ? "bg-amber-500"
-                  : "bg-zinc-500"
+                  : "bg-[#4B5563]"
             }`}
             aria-hidden
           />
@@ -141,7 +141,7 @@ export function RealDeploymentPanel({
         {[...readiness.passing, ...readiness.blockers].map((check) => (
           <li
             key={check.id}
-            className="flex items-start gap-2 rounded-lg border border-zinc-800 bg-[#0E0E10] px-2.5 py-1.5"
+            className="flex items-start gap-2 rounded-lg border border-[#E5E7EB] bg-white px-2.5 py-1.5"
           >
             <span
               className={`mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full ${
@@ -150,11 +150,11 @@ export function RealDeploymentPanel({
               aria-hidden
             />
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-medium text-zinc-100">
+              <div className="text-xs font-medium text-[#111827]">
                 {check.label}
               </div>
               {!check.ok && check.reason ? (
-                <p className="mt-0.5 text-[11px] text-zinc-500">
+                <p className="mt-0.5 text-[11px] text-[#4B5563]">
                   {check.reason}
                 </p>
               ) : null}
@@ -163,7 +163,7 @@ export function RealDeploymentPanel({
         ))}
       </ul>
 
-      <p className="mb-3 text-[11px] italic text-zinc-500">
+      <p className="mb-3 text-[11px] italic text-[#4B5563]">
         Not a medical, emergency, or monitoring replacement. In a life-threatening
         emergency, call your local emergency line first.
       </p>
@@ -173,7 +173,7 @@ export function RealDeploymentPanel({
           type="button"
           onClick={startRealCall}
           disabled={!readiness.ready || isCalling}
-          className="rounded-lg bg-[#818CF8] px-3 py-2 text-sm font-medium text-zinc-950 shadow-sm hover:bg-indigo-400 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+          className="rounded-lg bg-[#E65C00] px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:bg-[#E5E7EB] disabled:text-[#4B5563]"
         >
           {isCalling ? "Starting…" : "Start real elder call"}
         </button>
@@ -181,22 +181,22 @@ export function RealDeploymentPanel({
           type="button"
           onClick={refresh}
           disabled={isRefreshing}
-          className="rounded-lg border border-zinc-800 bg-transparent px-3 py-2 text-xs font-medium text-zinc-300 hover:bg-zinc-800/50 disabled:opacity-60"
+          className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-xs font-medium text-[#4B5563] hover:bg-[#F7F4EB] disabled:opacity-60"
         >
           {isRefreshing ? "Checking…" : "Re-check readiness"}
         </button>
       </div>
 
       {callState.kind === "calling" ? (
-        <p className="mt-3 text-xs text-zinc-400">Starting outbound call…</p>
+        <p className="mt-3 text-xs text-[#4B5563]">Starting outbound call…</p>
       ) : null}
       {callState.kind === "success" ? (
-        <p className="mt-3 rounded-md border border-[#818CF8]/40 bg-[#818CF8]/15 px-2.5 py-2 text-xs font-medium text-[#818CF8]">
+        <p className="mt-3 rounded-md border border-[#E65C00]/40 bg-[#E65C00]/10 px-2.5 py-2 text-xs font-medium text-[#9A3412]">
           {callState.message}
         </p>
       ) : null}
       {callState.kind === "error" ? (
-        <div className="mt-3 rounded-md border border-red-500/40 bg-red-500/15 px-2.5 py-2 text-xs text-red-300">
+        <div className="mt-3 rounded-md border border-red-300 bg-red-100 px-2.5 py-2 text-xs text-red-700">
           <p className="font-medium">{callState.message}</p>
           {callState.blockers && callState.blockers.length > 0 ? (
             <ul className="mt-1 list-disc space-y-0.5 pl-4">
@@ -211,7 +211,7 @@ export function RealDeploymentPanel({
         </div>
       ) : null}
 
-      <p className="mt-3 text-[11px] text-zinc-500">
+      <p className="mt-3 text-[11px] text-[#4B5563]">
         If services fail mid-call, switch back to Run simulated transcript
         above.
       </p>

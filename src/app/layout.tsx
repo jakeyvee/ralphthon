@@ -33,9 +33,9 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#0E0E10] text-white text-[15px] leading-relaxed">
+      <body className="min-h-full flex flex-col bg-[#FDFBF7] text-[#111827] text-[15px] leading-relaxed">
         <div className="flex-1">{children}</div>
-        <footer className="border-t border-zinc-800 bg-[#18181C] px-6 py-3 text-xs text-zinc-400">
+        <footer className="border-t border-[#E5E7EB] bg-[#F7F4EB] px-6 py-3 text-xs text-[#4B5563]">
           Not a medical, emergency, or monitoring replacement.
         </footer>
       </body>

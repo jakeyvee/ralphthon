@@ -15,25 +15,25 @@ import type {
 export const dynamic = "force-dynamic";
 
 const SPEAKER_TONE: Record<ChunkSpeaker, string> = {
-  elder: "bg-[#F472B6]/15 text-[#F472B6] border border-[#F472B6]/40",
-  agent: "bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/40",
-  system: "bg-zinc-800 text-zinc-300 border border-zinc-700",
+  elder: "bg-[#FFB380]/30 text-[#9A3412] border border-[#FFB380]",
+  agent: "bg-[#E65C00]/15 text-[#E65C00] border border-[#E65C00]/40",
+  system: "bg-[#E5E7EB] text-[#4B5563] border border-[#E5E7EB]",
 };
 
 const DELIVERY_TONE: Record<DeliveryStatus, string> = {
-  pending: "bg-zinc-800 text-zinc-300 border-zinc-700",
-  sent: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
-  failed: "bg-red-500/15 text-red-300 border-red-500/40",
-  preview: "bg-[#F472B6]/15 text-[#F472B6] border-[#F472B6]/40",
+  pending: "bg-[#E5E7EB] text-[#4B5563] border-[#E5E7EB]",
+  sent: "bg-[#E65C00]/15 text-[#E65C00] border-[#E65C00]/40",
+  failed: "bg-red-100 text-red-700 border-red-300",
+  preview: "bg-[#FFB380]/30 text-[#9A3412] border-[#FFB380]",
 };
 
 const STATUS_TONE: Record<string, string> = {
-  idle: "bg-zinc-800 text-zinc-300 border-zinc-700",
-  queued: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
-  ringing: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
-  in_progress: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
-  completed: "bg-zinc-800 text-zinc-300 border-zinc-700",
-  failed: "bg-red-500/15 text-red-300 border-red-500/40",
+  idle: "bg-[#E5E7EB] text-[#4B5563] border-[#E5E7EB]",
+  queued: "bg-[#E65C00]/15 text-[#E65C00] border-[#E65C00]/40",
+  ringing: "bg-[#E65C00]/15 text-[#E65C00] border-[#E65C00]/40",
+  in_progress: "bg-emerald-100 text-emerald-700 border-emerald-300",
+  completed: "bg-[#E5E7EB] text-[#4B5563] border-[#E5E7EB]",
+  failed: "bg-red-100 text-red-700 border-red-300",
 };
 
 function truncate(text: string, max = 80): string {
@@ -51,24 +51,24 @@ export default async function CallAuditPage(props: {
   const { call, chunks, events, deliveries, handoffs } = audit;
   const sourceTone =
     call.source === "real"
-      ? "bg-emerald-500/15 text-emerald-300 border-emerald-500/40"
-      : "bg-zinc-800 text-zinc-300 border-zinc-700";
+      ? "bg-emerald-100 text-emerald-700 border-emerald-300"
+      : "bg-[#E5E7EB] text-[#4B5563] border-[#E5E7EB]";
   const statusTone =
-    STATUS_TONE[call.status] ?? "bg-zinc-800 text-zinc-300 border-zinc-700";
+    STATUS_TONE[call.status] ?? "bg-[#E5E7EB] text-[#4B5563] border-[#E5E7EB]";
 
   return (
-    <main className="mx-auto w-full max-w-4xl bg-[#0E0E10] px-4 py-6 sm:px-6">
+    <main className="mx-auto w-full max-w-4xl bg-[#FDFBF7] px-4 py-6 sm:px-6">
       <div className="space-y-4">
         {/* Header */}
-        <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
+        <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <Link
               href="/"
-              className="text-xs font-medium text-zinc-400 hover:text-white"
+              className="text-xs font-medium text-[#4B5563] hover:text-[#111827]"
             >
               &larr; Back to dashboard
             </Link>
-            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#4B5563]">
               Call audit
             </span>
           </div>
@@ -83,17 +83,17 @@ export default async function CallAuditPage(props: {
             >
               {call.status}
             </span>
-            <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-[#4B5563]">
               started {formatSgt(call.started_at_sgt)}
             </span>
             {call.ended_at_sgt ? (
-              <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+              <span className="font-mono text-[11px] uppercase tracking-wider text-[#4B5563]">
                 · ended {formatSgt(call.ended_at_sgt)}
               </span>
             ) : null}
           </div>
           <p
-            className="mt-2 truncate font-mono text-[11px] text-[#818CF8]"
+            className="mt-2 truncate font-mono text-[11px] text-[#E65C00]"
             title={call.id}
           >
             id: {call.id}
@@ -101,8 +101,8 @@ export default async function CallAuditPage(props: {
         </section>
 
         {/* Transcript chunks */}
-        <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
-          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
+          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
             Transcript chunks
           </h2>
           {chunks.length === 0 ? (
@@ -112,7 +112,7 @@ export default async function CallAuditPage(props: {
               {chunks.map((chunk) => (
                 <li
                   key={chunk.id}
-                  className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
+                  className="rounded-xl border border-[#E5E7EB] bg-white p-3"
                 >
                   <div className="mb-1 flex items-center justify-between gap-2">
                     <span
@@ -122,11 +122,11 @@ export default async function CallAuditPage(props: {
                     >
                       {chunk.source}
                     </span>
-                    <time className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                    <time className="font-mono text-[11px] uppercase tracking-wider text-[#4B5563]">
                       {formatSgt(chunk.timestamp_sgt)}
                     </time>
                   </div>
-                  <p className="text-sm text-zinc-100">{chunk.text}</p>
+                  <p className="text-sm text-[#111827]">{chunk.text}</p>
                 </li>
               ))}
             </ol>
@@ -134,8 +134,8 @@ export default async function CallAuditPage(props: {
         </section>
 
         {/* Trigger events */}
-        <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
-          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
+          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
             Trigger events
           </h2>
           {events.length === 0 ? (
@@ -145,25 +145,25 @@ export default async function CallAuditPage(props: {
               {events.map((ev) => (
                 <li
                   key={ev.id}
-                  className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3"
+                  className="rounded-xl border border-amber-300 bg-amber-50 p-3"
                 >
                   <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-amber-200">
+                    <span className="text-sm font-semibold text-amber-800">
                       {ev.rule_name}
                     </span>
-                    <time className="font-mono text-[11px] uppercase tracking-wider text-amber-300/80">
+                    <time className="font-mono text-[11px] uppercase tracking-wider text-amber-700/80">
                       {formatSgt(ev.timestamp_sgt)}
                     </time>
                   </div>
-                  <p className="text-xs text-zinc-200">
+                  <p className="text-xs text-[#111827]">
                     <span className="font-semibold">Recommended:</span>{" "}
                     {ev.recommended_action}
                   </p>
-                  <p className="mt-1 text-xs italic text-zinc-300">
+                  <p className="mt-1 text-xs italic text-[#4B5563]">
                     Matched: {ev.matched_text || "(no excerpt)"}
                   </p>
                   {ev.context_excerpt ? (
-                    <blockquote className="mt-2 border-l-2 border-amber-500/60 pl-3 text-xs text-zinc-400">
+                    <blockquote className="mt-2 border-l-2 border-amber-500/60 pl-3 text-xs text-[#4B5563]">
                       {ev.context_excerpt}
                     </blockquote>
                   ) : null}
@@ -174,8 +174,8 @@ export default async function CallAuditPage(props: {
         </section>
 
         {/* Delivery attempts */}
-        <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
-          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
+          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
             Delivery attempts
           </h2>
           {deliveries.length === 0 ? (
@@ -190,8 +190,8 @@ export default async function CallAuditPage(props: {
         </section>
 
         {/* Handoff actions */}
-        <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
-          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
+          <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
             Handoff actions
           </h2>
           {handoffs.length === 0 ? (
@@ -201,18 +201,18 @@ export default async function CallAuditPage(props: {
               {handoffs.map((h) => (
                 <li
                   key={h.id}
-                  className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
+                  className="rounded-xl border border-[#E5E7EB] bg-white p-3"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-[#111827]">
                       {h.resource_name}
                     </span>
-                    <time className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                    <time className="font-mono text-[11px] uppercase tracking-wider text-[#4B5563]">
                       {formatSgt(h.timestamp_sgt)}
                     </time>
                   </div>
                   {h.note ? (
-                    <p className="mt-1 text-xs text-zinc-400">{h.note}</p>
+                    <p className="mt-1 text-xs text-[#4B5563]">{h.note}</p>
                   ) : null}
                 </li>
               ))}
@@ -220,7 +220,7 @@ export default async function CallAuditPage(props: {
           )}
         </section>
 
-        <p className="px-1 pt-2 text-center text-[11px] text-zinc-500">
+        <p className="px-1 pt-2 text-center text-[11px] text-[#4B5563]">
           Not a medical, emergency, or monitoring replacement.
         </p>
       </div>
@@ -230,7 +230,7 @@ export default async function CallAuditPage(props: {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-800 bg-[#0E0E10] p-4 text-center text-xs text-zinc-500">
+    <div className="rounded-xl border border-dashed border-[#E5E7EB] bg-white p-4 text-center text-xs text-[#4B5563]">
       {text}
     </div>
   );
@@ -243,8 +243,8 @@ function DeliveryRow({ attempt }: { attempt: DeliveryAttempt }) {
       ? attempt.payload
       : "";
   return (
-    <li className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-[#0E0E10] p-3">
-      <span className="rounded-full border border-zinc-700 bg-zinc-800 px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-zinc-300">
+    <li className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3">
+      <span className="rounded-full border border-[#E5E7EB] bg-[#F7F4EB] px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#4B5563]">
         {attempt.channel}
       </span>
       <span
@@ -255,11 +255,11 @@ function DeliveryRow({ attempt }: { attempt: DeliveryAttempt }) {
         {attempt.status}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">{formatSgt(attempt.timestamp_sgt)}</p>
+        <p className="font-mono text-[11px] uppercase tracking-wider text-[#4B5563]">{formatSgt(attempt.timestamp_sgt)}</p>
         {preview ? (
           <p
             className={`mt-1 truncate text-xs ${
-              attempt.error ? "text-red-300" : "text-zinc-200"
+              attempt.error ? "text-red-700" : "text-[#111827]"
             }`}
             title={preview}
           >

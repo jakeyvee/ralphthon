@@ -3,7 +3,7 @@
 // VOL-151: Family-editable trigger rules — UI.
 // Lets a family member add / edit / disable / delete rules that the call
 // scanner (VOL-142) reads per chunk via VOL-144. Style intentionally mirrors
-// ConfigPanel and AuditPanel: rounded-2xl border border-zinc-800 bg-[#18181C] p-6.
+// ConfigPanel and AuditPanel: rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6.
 
 import { useState, useTransition } from "react";
 import type { TriggerRule } from "@/lib/types";
@@ -232,9 +232,9 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
+    <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
+        <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
           Trigger rules
         </h3>
         <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
             type="button"
             onClick={handleReset}
             disabled={isPending}
-            className="rounded-lg bg-[#F472B6] px-3 py-1.5 text-xs font-medium text-zinc-950 shadow-sm hover:bg-pink-400 disabled:opacity-60"
+            className="rounded-lg bg-[#FFB380] px-3 py-1.5 text-xs font-medium text-[#9A3412] shadow-sm hover:bg-[#FFB380]/80 disabled:opacity-60"
           >
             Reset to preset
           </button>
@@ -253,8 +253,8 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
         <div
           className={`mb-3 rounded-md border px-2 py-1 text-xs font-medium ${
             globalFlash.kind === "success"
-              ? "border-[#818CF8]/40 bg-[#818CF8]/15 text-[#818CF8]"
-              : "border-red-500/40 bg-red-500/15 text-red-300"
+              ? "border-[#E65C00]/40 bg-[#E65C00]/10 text-[#9A3412]"
+              : "border-red-300 bg-red-100 text-red-700"
           }`}
           role="status"
         >
@@ -264,7 +264,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
 
       <ul className="space-y-2">
         {rules.length === 0 ? (
-          <li className="rounded-lg border border-dashed border-zinc-800 bg-[#0E0E10] p-4 text-center text-xs text-zinc-500">
+          <li className="rounded-lg border border-dashed border-[#E5E7EB] bg-white p-4 text-center text-xs text-[#4B5563]">
             No rules. Add one below or reset to preset.
           </li>
         ) : null}
@@ -272,7 +272,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
         {rules.map((rule, index) => (
           <li
             key={`${rule.id}-${index}`}
-            className="rounded-xl border border-zinc-800 bg-[#0E0E10]"
+            className="rounded-xl border border-[#E5E7EB] bg-white"
           >
             <div className="flex items-center gap-2 px-3 py-2">
               <button
@@ -284,30 +284,30 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                 <span
                   className={`inline-block transition-transform ${
                     rule._open ? "rotate-90" : ""
-                  } text-zinc-500`}
+                  } text-[#4B5563]`}
                   aria-hidden="true"
                 >
                   &#9656;
                 </span>
-                <span className="truncate text-sm font-medium text-zinc-100">
+                <span className="truncate text-sm font-medium text-[#111827]">
                   {rule.name.trim() || (
-                    <span className="italic text-zinc-500">
+                    <span className="italic text-[#4B5563]">
                       (untitled rule)
                     </span>
                   )}
                 </span>
                 {rule.is_preset ? (
-                  <span className="rounded-full border border-[#F472B6]/50 bg-transparent px-2 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide text-[#F472B6]">
+                  <span className="rounded-full border border-[#FFB380] bg-[#FFB380]/30 px-2 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide text-[#9A3412]">
                     Preset
                   </span>
                 ) : null}
                 {rule._isNew ? (
-                  <span className="rounded-full border border-amber-500/40 bg-amber-500/15 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-300">
+                  <span className="rounded-full border border-amber-300 bg-amber-100 px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide text-amber-800">
                     Unsaved
                   </span>
                 ) : null}
               </button>
-              <label className="flex items-center gap-1 text-xs text-zinc-400">
+              <label className="flex items-center gap-1 text-xs text-[#4B5563]">
                 <input
                   type="checkbox"
                   checked={rule.enabled}
@@ -320,11 +320,11 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
             </div>
 
             {rule._open ? (
-              <div className="space-y-3 border-t border-zinc-800 px-3 py-3">
+              <div className="space-y-3 border-t border-[#E5E7EB] px-3 py-3">
                 <div className="space-y-1">
                   <label
                     htmlFor={`rule-name-${index}`}
-                    className="block text-xs font-medium text-zinc-400"
+                    className="block text-xs font-medium text-[#4B5563]"
                   >
                     Name
                   </label>
@@ -335,7 +335,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                     onChange={(e) =>
                       patchRule(index, { name: e.target.value })
                     }
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
+                    className="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111827] placeholder-[#4B5563] focus:border-[#E65C00] focus:ring-1 focus:ring-[#E65C00]/40 focus:outline-none"
                     placeholder="e.g. Did not sleep"
                   />
                 </div>
@@ -343,7 +343,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                 <div className="space-y-1">
                   <label
                     htmlFor={`rule-patterns-${index}`}
-                    className="block text-xs font-medium text-zinc-400"
+                    className="block text-xs font-medium text-[#4B5563]"
                   >
                     Patterns (one per line, case-insensitive)
                   </label>
@@ -354,7 +354,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                       patchRule(index, { _patternsText: e.target.value })
                     }
                     rows={4}
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
+                    className="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111827] placeholder-[#4B5563] focus:border-[#E65C00] focus:ring-1 focus:ring-[#E65C00]/40 focus:outline-none"
                     placeholder={"didn't sleep\nno sleep\ncouldn't sleep"}
                   />
                 </div>
@@ -362,7 +362,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                 <div className="space-y-1">
                   <label
                     htmlFor={`rule-action-${index}`}
-                    className="block text-xs font-medium text-zinc-400"
+                    className="block text-xs font-medium text-[#4B5563]"
                   >
                     Recommended action
                   </label>
@@ -375,13 +375,13 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                       })
                     }
                     rows={2}
-                    className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
+                    className="w-full rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#111827] placeholder-[#4B5563] focus:border-[#E65C00] focus:ring-1 focus:ring-[#E65C00]/40 focus:outline-none"
                     placeholder="e.g. Ask about sleep tonight; check medication and routine."
                   />
                 </div>
 
                 {rule._error ? (
-                  <p className="text-xs font-medium text-red-300">
+                  <p className="text-xs font-medium text-red-700">
                     {rule._error}
                   </p>
                 ) : null}
@@ -391,12 +391,12 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                     type="button"
                     onClick={() => handleSave(index)}
                     disabled={isPending}
-                    className="rounded-lg bg-[#818CF8] px-3 py-1.5 text-xs font-medium text-zinc-950 shadow-sm hover:bg-indigo-400 disabled:opacity-60"
+                    className="rounded-lg bg-[#E65C00] px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-orange-600 disabled:opacity-60"
                   >
                     {isPending ? "Saving..." : "Save rule"}
                   </button>
                   {rule.is_preset ? (
-                    <span className="text-[11px] text-zinc-500">
+                    <span className="text-[11px] text-[#4B5563]">
                       Preset rules can be disabled but not deleted.
                     </span>
                   ) : (
@@ -404,7 +404,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                       type="button"
                       onClick={() => handleDelete(index)}
                       disabled={isPending}
-                      className="rounded-lg border border-[#F472B6]/40 bg-transparent px-3 py-1.5 text-xs font-medium text-[#F472B6] hover:bg-[#F472B6]/10 disabled:opacity-60"
+                      className="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
                       aria-label="Delete rule"
                     >
                       Delete
@@ -414,8 +414,8 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
                     <span
                       className={`rounded-md border px-2 py-0.5 text-[11px] font-medium ${
                         rule._flash.kind === "success"
-                          ? "border-[#818CF8]/40 bg-[#818CF8]/15 text-[#818CF8]"
-                          : "border-red-500/40 bg-red-500/15 text-red-300"
+                          ? "border-[#E65C00]/40 bg-[#E65C00]/10 text-[#9A3412]"
+                          : "border-red-300 bg-red-100 text-red-700"
                       }`}
                       role="status"
                     >
@@ -434,11 +434,11 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
           type="button"
           onClick={handleAdd}
           disabled={isPending}
-          className="rounded-lg border border-zinc-800 bg-transparent px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800/50 disabled:opacity-60"
+          className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-medium text-[#4B5563] hover:bg-[#F7F4EB] disabled:opacity-60"
         >
           + Add rule
         </button>
-        <span className="text-[11px] text-zinc-500">
+        <span className="text-[11px] text-[#4B5563]">
           Edits apply to the next call.
         </span>
       </div>
