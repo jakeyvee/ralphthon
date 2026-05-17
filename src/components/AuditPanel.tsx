@@ -103,6 +103,48 @@ export function AuditPanel({
     return () => { cancelled = true; };
   }, [state.memory]);
 
+  // VOL-155: polling fallback (Realtime can silently no-op under RLS).
+  useEffect(() => {
+    let cancelled = false;
+    const dedupeById = <T extends { id: string }>(rows: T[]): T[] => {
+      const seen = new Set<string>();
+      return rows.filter((r) => (seen.has(r.id) ? false : (seen.add(r.id), true)));
+    };
+    async function tick() {
+      try {
+        const activeId = state.call.call_id;
+        let callId = activeId;
+        if (!callId) {
+          const r = await fetch("/api/calls/latest", { cache: "no-store" });
+          if (!r.ok) return;
+          callId = ((await r.json()) as { callId: string | null }).callId;
+        }
+        if (!callId || cancelled) return;
+        const r = await fetch(`/api/calls/${callId}/audit`, { cache: "no-store" });
+        if (!r.ok || cancelled) return;
+        const d = (await r.json()) as {
+          call: { id: string; status: CallStatus; source: CallSource } | null;
+          chunks: TranscriptChunk[];
+          events: TriggerEvent[];
+          deliveries: DeliveryAttempt[];
+          handoffs: HandoffAction[];
+        };
+        if (cancelled || !d.call) return;
+        setState((s) => ({
+          ...s,
+          call: { status: d.call!.status, source: d.call!.source, call_id: d.call!.id },
+          chunks: dedupeById([...s.chunks, ...d.chunks]),
+          triggerEvents: dedupeById([...s.triggerEvents, ...d.events]),
+          deliveries: dedupeById([...s.deliveries, ...d.deliveries]),
+          handoffs: dedupeById([...s.handoffs, ...d.handoffs]),
+        }));
+      } catch {}
+    }
+    const iv = setInterval(tick, 1500);
+    tick();
+    return () => { cancelled = true; clearInterval(iv); };
+  }, [state.call.call_id]);
+
   // Realtime subscription (best-effort)
   useEffect(() => {
     const client = getBrowserSupabase();
