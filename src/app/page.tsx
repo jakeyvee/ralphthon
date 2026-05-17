@@ -67,6 +67,9 @@ export default async function Home() {
             One-screen control room for daily elder voice check-ins. Configure
             on the left, watch the call audit unfold on the right.
           </p>
+          <p className="mt-2 max-w-2xl text-sm font-medium text-zinc-800">
+            The key is not just that it alerts. The family can see exactly why.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <StatusBadge
