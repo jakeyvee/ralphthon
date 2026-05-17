@@ -11,12 +11,44 @@
 // ElevenLabs does not retry-storm us.
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { env } from "@/lib/env";
 import { getServerSupabase } from "@/lib/supabase/server";
 import {
   normalizeElevenLabsEvent,
   type NormalizedTranscriptEvent,
 } from "@/lib/transcript/normalize";
+
+// ElevenLabs signs webhooks with a Stripe-style header:
+//   ElevenLabs-Signature: t=<unix_ts>,v0=<hex_sha256>
+// where v0 = HMAC-SHA256(`${t}.${rawBody}`, secret).
+// We verify when the secret is configured. On mismatch we LOG and still
+// accept the payload (hackathon robustness) so a header-format quirk
+// doesn't kill a live demo.
+function verifyElevenLabsSignature(
+  rawBody: string,
+  headerValue: string | null,
+  secret: string,
+): { ok: boolean; reason: string } {
+  if (!headerValue) return { ok: false, reason: "no_signature_header" };
+  const parts = headerValue.split(",").map((p) => p.trim());
+  const tPart = parts.find((p) => p.startsWith("t="))?.slice(2);
+  const sigPart = parts.find((p) => /^v0?=/.test(p))?.split("=")[1];
+  if (!tPart || !sigPart) return { ok: false, reason: "malformed_signature_header" };
+  const mac = createHmac("sha256", secret);
+  mac.update(`${tPart}.${rawBody}`);
+  const expected = mac.digest("hex");
+  try {
+    const a = Buffer.from(expected, "hex");
+    const b = Buffer.from(sigPart, "hex");
+    if (a.length !== b.length) return { ok: false, reason: "signature_length_mismatch" };
+    return timingSafeEqual(a, b)
+      ? { ok: true, reason: "ok" }
+      : { ok: false, reason: "signature_mismatch" };
+  } catch {
+    return { ok: false, reason: "signature_compare_error" };
+  }
+}
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,22 +108,180 @@ async function nextSequence(callId: string): Promise<number> {
   return (count ?? 0) + 1;
 }
 
-function originFromRequest(request: NextRequest): string {
-  const configured = env.publicAppUrl?.replace(/\/$/, "");
-  if (configured) return configured;
-  return request.nextUrl.origin;
+function originFromRequest(_request: NextRequest): string {
+  // Internal self-loopback to /api/calls/[id]/chunks must use localhost so
+  // we don't round-trip back out through Cloudflare. The tunnel URL is only
+  // for external traffic (ElevenLabs POSTing in, Telegram audit links).
+  const port = process.env.PORT ?? "3000";
+  return `http://127.0.0.1:${port}`;
 }
 
 export async function POST(request: NextRequest) {
+  // Read the raw body FIRST so HMAC is computed over the exact bytes sent.
+  const rawBody = await request.text();
+
+  // HMAC verification (logged-but-accepted on mismatch — see helper).
+  const secret = env.elevenlabs.webhookSecret;
+  if (secret) {
+    const sigHeader =
+      request.headers.get("elevenlabs-signature") ??
+      request.headers.get("ElevenLabs-Signature");
+    const verdict = verifyElevenLabsSignature(rawBody, sigHeader, secret);
+    if (!verdict.ok) {
+      console.warn(
+        `[elevenlabs-webhook] signature check failed: ${verdict.reason} — accepting payload anyway for hackathon demo`,
+      );
+    } else {
+      console.log("[elevenlabs-webhook] signature verified");
+    }
+  }
+
+  // DEBUG: log the raw payload (full) so we can confirm event shape.
+  console.log(
+    "[elevenlabs-webhook] raw body length:",
+    rawBody.length,
+  );
+  console.log("[elevenlabs-webhook] raw body (full):", rawBody);
+
   let body: unknown;
   try {
-    body = await request.json();
+    body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json(
       { ok: true, ignored: true, reason: "invalid_json" },
       { status: 200 },
     );
   }
+
+  // ── post_call_transcription handler ──────────────────────────────────
+  // ElevenLabs's default webhook is the end-of-call summary. It carries
+  // the FULL conversation as `data.transcript[]`. We fan it out: forward
+  // every turn through the same /api/calls/[id]/chunks pipeline as if it
+  // had arrived live. The audit panel populates a few seconds after hang-up
+  // and the family gets Telegram + SMS alerts for any rule that matched.
+  if (
+    body &&
+    typeof body === "object" &&
+    (body as { type?: string }).type === "post_call_transcription"
+  ) {
+    const data = (body as { data?: Record<string, unknown> }).data ?? {};
+    console.log(
+      "[elevenlabs-webhook] post_call data keys:",
+      Object.keys(data ?? {}).join(","),
+    );
+    // Try several known field locations for the transcript array.
+    const candidateLocations: unknown[] = [
+      (data as { transcript?: unknown }).transcript,
+      (data as { messages?: unknown }).messages,
+      (data as { turns?: unknown }).turns,
+      ((data as { conversation?: { transcript?: unknown } }).conversation ?? {})
+        .transcript,
+      ((data as { result?: { transcript?: unknown } }).result ?? {})
+        .transcript,
+    ];
+    const pickedRaw = candidateLocations.find((c) => Array.isArray(c));
+    const transcript = Array.isArray(pickedRaw)
+      ? (pickedRaw as Array<Record<string, unknown>>)
+      : [];
+    console.log(
+      "[elevenlabs-webhook] resolved transcript array length:",
+      transcript.length,
+    );
+    if (transcript.length > 0) {
+      console.log(
+        "[elevenlabs-webhook] first turn keys:",
+        Object.keys(transcript[0] ?? {}).join(","),
+      );
+      console.log(
+        "[elevenlabs-webhook] first turn sample:",
+        JSON.stringify(transcript[0]).slice(0, 400),
+      );
+    }
+
+    // Resolve our internal call_id. Prefer the dynamic variable we passed
+    // in the outbound call; fall back to the most recent active real call.
+    const dyn =
+      (
+        (data as {
+          conversation_initiation_client_data?: {
+            dynamic_variables?: Record<string, unknown>;
+          };
+        }).conversation_initiation_client_data?.dynamic_variables ?? {}
+      ) ?? {};
+    const explicitCallId =
+      typeof (dyn as { call_id?: unknown }).call_id === "string"
+        ? ((dyn as { call_id: string }).call_id as string)
+        : null;
+
+    const resolved = explicitCallId
+      ? { callId: explicitCallId }
+      : await resolveCallId(undefined);
+
+    if (!resolved.callId) {
+      return NextResponse.json(
+        { ok: false, ignored: true, reason: "no_active_real_call_for_post_call" },
+        { status: 200 },
+      );
+    }
+
+    const origin = originFromRequest(request);
+    const forwardUrl = `${origin}/api/calls/${encodeURIComponent(
+      resolved.callId,
+    )}/chunks`;
+
+    let forwardedChunks = 0;
+    let firstError: string | undefined;
+    let seq = await nextSequence(resolved.callId);
+
+    for (const turn of transcript) {
+      const role = String(
+        (turn as { role?: unknown }).role ?? "",
+      ).toLowerCase();
+      const text = String(
+        (turn as { message?: unknown; text?: unknown }).message ??
+          (turn as { text?: unknown }).text ??
+          "",
+      ).trim();
+      if (!text) continue;
+      const source: "elder" | "agent" | "system" =
+        role === "user" || role === "human"
+          ? "elder"
+          : role === "agent" || role === "assistant"
+            ? "agent"
+            : "system";
+
+      try {
+        const res = await fetch(forwardUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source, text, sequence: seq }),
+        });
+        if (res.ok) {
+          forwardedChunks++;
+        } else if (!firstError) {
+          firstError = `pipeline ${res.status}`;
+        }
+      } catch (err) {
+        if (!firstError) {
+          firstError = err instanceof Error ? err.message : String(err);
+        }
+      }
+      seq++;
+    }
+
+    return NextResponse.json(
+      {
+        ok: !firstError,
+        callId: resolved.callId,
+        type: "post_call_transcription",
+        forwardedChunks,
+        totalTurns: transcript.length,
+        error: firstError,
+      },
+      { status: 200 },
+    );
+  }
+  // ─────────────────────────────────────────────────────────────────────
 
   let normalised: NormalizedTranscriptEvent | null;
   try {
