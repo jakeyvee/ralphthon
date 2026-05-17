@@ -102,7 +102,7 @@ export function ConfigPanel({
             onChange={(e) => update("elder_name", e.target.value)}
             type="text"
             autoComplete="off"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder="e.g. Mdm Tan"
           />
         </Field>
@@ -114,7 +114,7 @@ export function ConfigPanel({
             onChange={(e) => update("elder_phone", e.target.value)}
             type="tel"
             autoComplete="off"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder="+6591234567"
           />
         </Field>
@@ -129,7 +129,7 @@ export function ConfigPanel({
             onChange={(e) => update("family_name", e.target.value)}
             type="text"
             autoComplete="off"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder="e.g. Wei Ling"
           />
         </Field>
@@ -144,7 +144,7 @@ export function ConfigPanel({
             onChange={(e) => update("telegram_bot_token", e.target.value)}
             type="password"
             autoComplete="off"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder="123456:ABC-..."
           />
         </Field>
@@ -156,7 +156,7 @@ export function ConfigPanel({
             onChange={(e) => update("telegram_chat_id", e.target.value)}
             type="text"
             autoComplete="off"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder="-100..."
           />
         </Field>
@@ -181,7 +181,7 @@ export function ConfigPanel({
               )
             }
             rows={3}
-            className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="w-full rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
             placeholder={"+6591234567\n+6598765432"}
           />
         </Field>
@@ -198,10 +198,10 @@ export function ConfigPanel({
             value={config.daily_call_time_sgt}
             onChange={(e) => update("daily_call_time_sgt", e.target.value)}
             type="time"
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-zinc-500 focus:outline-none"
+            className="rounded-lg border border-zinc-800 bg-[#0E0E10] px-3 py-2 text-sm text-white placeholder-zinc-500 focus:border-[#818CF8] focus:outline-none"
           />
         </Field>
-        <label className="mt-2 flex items-start gap-2 rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-sm">
+        <label className="mt-2 flex items-start gap-2 rounded-xl border border-zinc-800 bg-[#0E0E10] p-3 text-sm">
           <input
             type="checkbox"
             name="consent_acknowledged"
@@ -211,7 +211,7 @@ export function ConfigPanel({
             }
             className="mt-0.5"
           />
-          <span className="text-zinc-700">
+          <span className="text-zinc-300">
             I have explained to the elder and family that this tool makes
             voice check-ins, transcribes them, and notifies designated family
             contacts when listed phrases occur. This is not a medical,
@@ -228,7 +228,7 @@ export function ConfigPanel({
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:opacity-60"
+          className="rounded-lg bg-[#818CF8] px-4 py-2 text-sm font-medium text-zinc-950 shadow-sm hover:bg-indigo-400 disabled:opacity-60"
         >
           {isPending ? "Saving..." : "Save config"}
         </button>
@@ -246,8 +246,8 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+    <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
+      <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
         {title}
       </h3>
       <div className="space-y-3">{children}</div>
@@ -266,7 +266,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1">
-      <label htmlFor={htmlFor} className="block text-xs font-medium text-zinc-600">
+      <label htmlFor={htmlFor} className="block text-xs font-medium text-zinc-400">
         {label}
       </label>
       {children}
@@ -277,9 +277,9 @@ function Field({
 function FlashBadge({ state }: { state: FlashState }) {
   if (state.kind === "idle" || state.kind === "saving") return null;
   const tone = {
-    success: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    warning: "bg-amber-50 text-amber-800 border-amber-200",
-    error: "bg-rose-50 text-rose-700 border-rose-200",
+    success: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
+    warning: "bg-amber-500/15 text-amber-300 border-amber-500/40",
+    error: "bg-red-500/15 text-red-300 border-red-500/40",
   }[state.kind];
   return (
     <span

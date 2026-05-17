@@ -60,14 +60,14 @@ export default async function Home() {
     <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          <h1 className="text-5xl font-medium leading-[1.04] tracking-tight text-white">
             Call-Check-Loop
           </h1>
-          <p className="mt-1 max-w-2xl text-sm text-zinc-600">
+          <p className="mt-3 max-w-2xl text-sm text-zinc-400">
             One-screen control room for daily elder voice check-ins. Configure
             on the left, watch the call audit unfold on the right.
           </p>
-          <p className="mt-2 max-w-2xl text-sm font-medium text-zinc-800">
+          <p className="mt-2 max-w-2xl text-sm font-medium text-[#818CF8]">
             The key is not just that it alerts. The family can see exactly why.
           </p>
         </div>
@@ -114,10 +114,8 @@ function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
-        ok
-          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-          : "border-amber-200 bg-amber-50 text-amber-800"
+      className={`inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-[#18181C] px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider font-semibold ${
+        ok ? "text-emerald-400" : "text-amber-400"
       }`}
     >
       <span

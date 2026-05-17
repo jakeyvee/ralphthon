@@ -57,19 +57,19 @@ const EMPTY_INITIAL: AuditPanelInitial = {
 };
 
 const STATUS_TONE: Record<CallStatus, string> = {
-  idle: "bg-zinc-100 text-zinc-700 border-zinc-200",
-  queued: "bg-sky-50 text-sky-700 border-sky-200",
-  ringing: "bg-indigo-50 text-indigo-700 border-indigo-200",
-  in_progress: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  completed: "bg-zinc-100 text-zinc-700 border-zinc-200",
-  failed: "bg-rose-50 text-rose-700 border-rose-200",
+  idle: "bg-zinc-800 text-zinc-300 border-zinc-700",
+  queued: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
+  ringing: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
+  in_progress: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
+  completed: "bg-zinc-800 text-zinc-300 border-zinc-700",
+  failed: "bg-red-500/15 text-red-300 border-red-500/40",
 };
 
 const DELIVERY_TONE: Record<DeliveryAttempt["status"], string> = {
-  pending: "bg-amber-50 text-amber-800 border-amber-200",
-  sent: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  failed: "bg-rose-50 text-rose-700 border-rose-200",
-  preview: "bg-zinc-100 text-zinc-600 border-zinc-200",
+  pending: "bg-zinc-800 text-zinc-300 border-zinc-700",
+  sent: "bg-[#818CF8]/15 text-[#818CF8] border-[#818CF8]/40",
+  failed: "bg-red-500/15 text-red-300 border-red-500/40",
+  preview: "bg-[#F472B6]/15 text-[#F472B6] border-[#F472B6]/40",
 };
 
 // VOL-161: tiny short-form relative time for "updated Xs ago" hint.
@@ -409,9 +409,9 @@ export function AuditPanel({
   return (
     <div className="space-y-4">
       {/* Controls bar */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+      <div className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
         {toast ? (
-          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          <div className="mb-3 rounded-lg border border-[#818CF8]/40 bg-[#818CF8]/15 px-3 py-2 text-sm text-[#818CF8]">
             {toast}
           </div>
         ) : null}
@@ -421,7 +421,7 @@ export function AuditPanel({
             disabled={busy !== null || callBlockers.length > 0}
             onClick={startReal}
             title={callDisabledReason ?? "Start a real voice check-in"}
-            className="rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-[#818CF8] px-3 py-1.5 text-sm font-medium text-zinc-950 shadow-sm hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy === "real" ? "Starting..." : "Start real test call"}
           </button>
@@ -429,7 +429,7 @@ export function AuditPanel({
             type="button"
             disabled={busy !== null}
             onClick={runSimulator}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded-lg bg-[#818CF8] px-3 py-1.5 text-sm font-medium text-zinc-950 shadow-sm hover:bg-indigo-400 disabled:opacity-50"
           >
             {busy === "simulator" ? "Running..." : "Run simulated transcript"}
           </button>
@@ -437,7 +437,7 @@ export function AuditPanel({
             type="button"
             disabled={busy !== null}
             onClick={sendTelegramTest}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded-lg border border-[#F472B6]/40 bg-transparent px-3 py-1.5 text-sm font-medium text-[#F472B6] hover:bg-[#F472B6]/10 disabled:opacity-50"
           >
             {busy === "telegram" ? "Sending..." : "Send Telegram test"}
           </button>
@@ -445,21 +445,21 @@ export function AuditPanel({
             type="button"
             disabled={busy !== null}
             onClick={resetDemo}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-50"
+            className="rounded-lg border border-zinc-800 bg-transparent px-3 py-1.5 text-sm font-medium text-zinc-300 hover:bg-zinc-800/50 disabled:opacity-50"
           >
             {busy === "reset" ? "Resetting..." : "Reset demo state"}
           </button>
           <div className="ml-auto flex items-center gap-2">
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider font-semibold ${
                 realtimeOn
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                  : "border-zinc-200 bg-zinc-100 text-zinc-600"
+                  ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                  : "border-zinc-700 bg-zinc-800 text-zinc-400"
               }`}
             >
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  realtimeOn ? "bg-emerald-500" : "bg-zinc-400"
+                  realtimeOn ? "bg-emerald-500" : "bg-zinc-500"
                 }`}
               />
               {realtimeOn ? "Realtime live" : "Realtime disabled"}
@@ -467,7 +467,7 @@ export function AuditPanel({
           </div>
         </div>
         {callDisabledReason ? (
-          <p className="mt-2 text-xs text-amber-700">{callDisabledReason}</p>
+          <p className="mt-2 text-xs text-amber-400">{callDisabledReason}</p>
         ) : null}
         <ToastStack toasts={toasts} />
       </div>
@@ -475,21 +475,21 @@ export function AuditPanel({
       <SectionCard title="Call status">
         <div className="flex flex-wrap items-center gap-2">
           <span
-            className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+            className={`rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider font-semibold ${
               STATUS_TONE[state.call.status]
             }`}
           >
             {state.call.status}
           </span>
-          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-xs text-zinc-600">
+          <span className="rounded-full border border-zinc-800 bg-[#0E0E10] px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider text-zinc-400">
             source: {state.call.source ?? "—"}
           </span>
-          <span className="text-xs text-zinc-500">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
             call id: {state.call.call_id ?? "—"}
           </span>
           {state.activeCallId ? (
             <span
-              className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[11px] text-emerald-700"
+              className="rounded-full border border-[#818CF8]/40 bg-[#818CF8]/10 px-2 py-0.5 font-mono text-[11px] text-[#818CF8]"
               title={`Bound to call ${state.activeCallId}`}
             >
               bound: {state.activeCallId.slice(0, 8)}…
@@ -506,15 +506,15 @@ export function AuditPanel({
             {state.chunks.map((chunk) => (
               <li
                 key={chunk.id}
-                className="rounded-xl border border-zinc-200 bg-zinc-50 p-3"
+                className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
                   <SpeakerChip speaker={chunk.source} />
-                  <time className="text-xs text-zinc-500">
+                  <time className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
                     {formatSgt(chunk.timestamp_sgt)}
                   </time>
                 </div>
-                <p className="text-sm text-zinc-800">{chunk.text}</p>
+                <p className="text-sm text-zinc-100">{chunk.text}</p>
               </li>
             ))}
           </ol>
@@ -531,19 +531,19 @@ export function AuditPanel({
               return (
                 <li
                   key={chunk.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-3"
+                  className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
                 >
-                  <p className="mb-2 truncate text-xs text-zinc-500">
+                  <p className="mb-2 truncate text-xs text-zinc-400">
                     Chunk #{chunk.sequence}: {chunk.text}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {evals.map((ev) => (
                       <span
                         key={ev.rule_id}
-                        className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+                        className={`rounded-full border px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider font-semibold ${
                           ev.matched
-                            ? "border-rose-200 bg-rose-50 text-rose-700"
-                            : "border-zinc-200 bg-zinc-50 text-zinc-500"
+                            ? "border-red-500/40 bg-red-500/15 text-red-300"
+                            : "border-zinc-800 bg-zinc-900 text-zinc-500"
                         }`}
                         title={
                           ev.matched
@@ -572,23 +572,23 @@ export function AuditPanel({
             {state.triggerEvents.map((ev) => (
               <li
                 key={ev.id}
-                className="rounded-xl border border-rose-200 bg-rose-50/40 p-3"
+                className="rounded-xl border border-red-500/40 bg-red-500/10 p-3"
               >
                 <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="text-sm font-semibold text-rose-800">
+                  <span className="text-sm font-semibold text-red-300">
                     {ev.rule_name}
                   </span>
-                  <time className="text-xs text-rose-700">
+                  <time className="font-mono text-[11px] uppercase tracking-wider text-red-300/80">
                     {formatSgt(ev.timestamp_sgt)}
                   </time>
                 </div>
-                <p className="text-xs text-zinc-700">
+                <p className="text-xs text-zinc-300">
                   Matched text: <span className="font-mono">{ev.matched_text}</span>
                 </p>
-                <p className="mt-1 text-xs text-zinc-600">
+                <p className="mt-1 text-xs text-zinc-400">
                   &ldquo;{ev.context_excerpt}&rdquo;
                 </p>
-                <p className="mt-2 text-xs text-zinc-800">
+                <p className="mt-2 text-xs text-zinc-200">
                   <span className="font-semibold">Recommended:</span>{" "}
                   {ev.recommended_action}
                 </p>
@@ -614,17 +614,17 @@ export function AuditPanel({
 
       <HandoffResources triggerEvents={state.triggerEvents} />
 
-      <div className={`rounded-2xl transition-colors duration-300${memoryPulse ? " bg-emerald-50" : ""}`}>
+      <div className={`rounded-2xl transition-colors duration-300${memoryPulse ? " bg-[#818CF8]/15" : ""}`}>
       <SectionCard title="Memory summary">
         {state.memory ? (
           <div className="space-y-1">
-            <p className="text-sm text-zinc-800 whitespace-pre-wrap">
+            <p className="text-sm text-zinc-200 whitespace-pre-wrap">
               {state.memory.summary}
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
               Updated {formatSgt(state.memory.updated_at_sgt)}
             </p>
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-2 font-mono text-[11px] uppercase tracking-wider text-zinc-500">
               updated {relativeTimeShort(state.memory.updated_at_sgt)}
             </p>
           </div>
@@ -645,8 +645,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-      <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+    <section className="rounded-2xl border border-zinc-800 bg-[#18181C] p-6 shadow-none">
+      <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-zinc-400">
         {title}
       </h3>
       {children}
@@ -656,7 +656,7 @@ function SectionCard({
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50/60 p-4 text-center text-xs text-zinc-500">
+    <div className="rounded-xl border border-dashed border-zinc-800 bg-[#0E0E10] p-4 text-center text-xs text-zinc-500">
       {text}
     </div>
   );
@@ -664,13 +664,13 @@ function EmptyState({ text }: { text: string }) {
 
 function SpeakerChip({ speaker }: { speaker: TranscriptChunk["source"] }) {
   const tone = {
-    elder: "bg-sky-100 text-sky-800",
-    agent: "bg-violet-100 text-violet-800",
-    system: "bg-zinc-200 text-zinc-700",
+    elder: "bg-[#F472B6]/15 text-[#F472B6] border border-[#F472B6]/40",
+    agent: "bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/40",
+    system: "bg-zinc-800 text-zinc-300 border border-zinc-700",
   }[speaker];
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide ${tone}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${tone}`}
     >
       {speaker}
     </span>
@@ -690,24 +690,24 @@ function DeliveryList({
       {attempts.map((a) => (
         <li
           key={a.id}
-          className="flex items-start gap-3 rounded-xl border border-zinc-200 bg-white p-3"
+          className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-[#0E0E10] p-3"
         >
           <span
-            className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
+            className={`rounded-full border px-2 py-0.5 font-mono text-[11px] font-semibold uppercase tracking-wider ${
               DELIVERY_TONE[a.status]
             }`}
           >
             {a.status === "preview" ? "Preview only" : a.status}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-zinc-500">
+            <p className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
               {formatSgt(a.timestamp_sgt)}
             </p>
             {a.payload ? (
-              <p className="mt-1 truncate text-sm text-zinc-800">{a.payload}</p>
+              <p className="mt-1 truncate text-sm text-zinc-200">{a.payload}</p>
             ) : null}
             {a.error ? (
-              <p className="mt-1 text-xs text-rose-700">{a.error}</p>
+              <p className="mt-1 text-xs text-red-300">{a.error}</p>
             ) : null}
           </div>
         </li>
@@ -726,13 +726,13 @@ function HandoffCard({
   onMark: () => void;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
-      <p className="text-sm font-semibold text-zinc-900">{name}</p>
-      <p className="mt-1 text-xs text-zinc-600">{purpose}</p>
+    <div className="rounded-xl border border-zinc-800 bg-[#0E0E10] p-3">
+      <p className="text-sm font-semibold text-white">{name}</p>
+      <p className="mt-1 text-xs text-zinc-400">{purpose}</p>
       <button
         type="button"
         onClick={onMark}
-        className="mt-3 rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
+        className="mt-3 rounded-md border border-zinc-800 bg-transparent px-2 py-1 text-xs font-medium text-zinc-300 hover:bg-zinc-800/50"
       >
         Mark handoff considered
       </button>
@@ -743,10 +743,10 @@ function HandoffCard({
 function ToastStack({ toasts }: { toasts: Toast[] }) {
   if (toasts.length === 0) return null;
   const tones = {
-    info: "border-sky-200 bg-sky-50 text-sky-800",
-    warn: "border-amber-200 bg-amber-50 text-amber-800",
-    error: "border-rose-200 bg-rose-50 text-rose-800",
-    success: "border-emerald-200 bg-emerald-50 text-emerald-800",
+    info: "border-[#818CF8]/40 bg-[#818CF8]/15 text-[#818CF8]",
+    warn: "border-amber-500/40 bg-amber-500/15 text-amber-300",
+    error: "border-red-500/40 bg-red-500/15 text-red-300",
+    success: "border-emerald-500/40 bg-emerald-500/15 text-emerald-300",
   };
   return (
     <ul className="mt-3 space-y-1">
