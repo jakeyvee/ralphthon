@@ -23,7 +23,7 @@ export async function POST() {
   }
 
   const when = formatSgt(nowSgtISO());
-  const message = `Call-Check-Loop test alert — sent at ${when}. This is a delivery test from the family control room.`;
+  const message = `🩺 Nurse Joy test alert — sent at ${when}. This is a delivery test from the family nurse station. 👩‍⚕️`;
 
   const telegramResult = await sendTelegramMessage(message);
 

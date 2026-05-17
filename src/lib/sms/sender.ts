@@ -39,7 +39,7 @@ export function formatSmsMessage(event: TriggerEvent): string {
   const when = event.timestamp_sgt ? formatSgt(event.timestamp_sgt) : "";
 
   const suffix = when ? ` (SGT ${when})` : "";
-  const head = `Call-Check-Loop alert: ${ruleName}. Excerpt: '`;
+  const head = `Nurse Joy alert: ${ruleName}. Excerpt: '`;
   const tail = `'. Action: ${action}.${suffix}`;
 
   const fixedLen = head.length + tail.length;

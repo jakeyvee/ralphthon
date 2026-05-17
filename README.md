@@ -1,6 +1,6 @@
-# Call-Check-Loop
+# Nurse Joy 👩‍⚕️🌸
 
-Daily voice check-in MVP for elders. Twilio places an outbound call, ElevenLabs handles the conversation, transcript chunks flow through a transparent rules engine, and matches escalate to the family via Telegram (and optionally SMS). Built for a 3-hour hackathon — every external integration has a visible "not configured" fallback.
+🏥 Daily voice check-in MVP for elders, codename **Call-Check-Loop**. Twilio places an outbound call, ElevenLabs (the Nurse Joy agent) handles the conversation, transcript chunks flow through a transparent rules engine 🩹, and matches escalate to the family via Telegram ✈️ (and optionally SMS 📱). Built for a 3-hour hackathon — every external integration has a visible "not configured" fallback.
 
 ## Stack
 

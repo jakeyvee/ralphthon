@@ -66,10 +66,10 @@ export default async function CallAuditPage(props: {
               href="/"
               className="text-xs font-medium text-[#4B5563] hover:text-[#111827]"
             >
-              &larr; Back to dashboard
+              &larr; Back to Nurse Joy
             </Link>
             <span className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#4B5563]">
-              Call audit
+              🩺 Call audit
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -103,7 +103,7 @@ export default async function CallAuditPage(props: {
         {/* Transcript chunks */}
         <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
           <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-            Transcript chunks
+            💬 Transcript chunks
           </h2>
           {chunks.length === 0 ? (
             <EmptyState text="No transcript chunks yet." />
@@ -136,7 +136,7 @@ export default async function CallAuditPage(props: {
         {/* Trigger events */}
         <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
           <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-            Trigger events
+            🚨 Trigger events
           </h2>
           {events.length === 0 ? (
             <EmptyState text="No triggers fired during this call." />
@@ -176,7 +176,7 @@ export default async function CallAuditPage(props: {
         {/* Delivery attempts */}
         <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
           <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-            Delivery attempts
+            📬 Delivery attempts
           </h2>
           {deliveries.length === 0 ? (
             <EmptyState text="No delivery attempts recorded." />
@@ -192,7 +192,7 @@ export default async function CallAuditPage(props: {
         {/* Handoff actions */}
         <section className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
           <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-            Handoff actions
+            🤝 Handoff actions
           </h2>
           {handoffs.length === 0 ? (
             <EmptyState text="No handoffs considered for this call." />

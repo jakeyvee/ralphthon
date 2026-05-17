@@ -36,7 +36,7 @@ export function formatAlertMessage(
 ): string {
   const when = formatSgt(event.timestamp_sgt ?? nowSgtISO());
   const lines: string[] = [
-    `*Call-Check-Loop alert — ${event.rule_name}*`,
+    `🚨 *Nurse Joy alert — ${event.rule_name}* 👩‍⚕️`,
     "",
     `Matched: _${event.matched_text || "(no excerpt)"}_`,
     `Context: ${event.context_excerpt || "(no context)"}`,

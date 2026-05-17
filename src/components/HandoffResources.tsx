@@ -131,7 +131,7 @@ export function HandoffResources({
   return (
     <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
       <h3 className="mb-3 font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-        AIC / SAGE handoff resources
+        🤝 AIC / SAGE handoff resources
       </h3>
 
       <div className="grid gap-3 sm:grid-cols-2">

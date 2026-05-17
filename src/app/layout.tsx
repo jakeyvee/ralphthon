@@ -18,9 +18,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Call-Check-Loop",
+  title: "Nurse Joy 👩‍⚕️",
   description:
-    "Daily voice check-ins for elders, with transparent family-facing escalation.",
+    "Nurse Joy: daily voice check-ins for elders, with transparent family-facing escalation. 🏥",
 };
 
 export default function RootLayout({
@@ -36,7 +36,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#FDFBF7] text-[#111827] text-[15px] leading-relaxed">
         <div className="flex-1">{children}</div>
         <footer className="border-t border-[#E5E7EB] bg-[#F7F4EB] px-6 py-3 text-xs text-[#4B5563]">
-          Not a medical, emergency, or monitoring replacement.
+          🩺 Nurse Joy is not a medical, emergency, or monitoring replacement.
         </footer>
       </body>
     </html>

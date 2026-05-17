@@ -423,7 +423,7 @@ export function AuditPanel({
             title={callDisabledReason ?? "Start a real voice check-in"}
             className="rounded-lg bg-[#E65C00] px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {busy === "real" ? "Starting..." : "Start real test call"}
+            {busy === "real" ? "📞 Calling..." : "📞 Start real test call"}
           </button>
           <button
             type="button"
@@ -431,7 +431,7 @@ export function AuditPanel({
             onClick={runSimulator}
             className="rounded-lg bg-[#E65C00] px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-orange-600 disabled:opacity-50"
           >
-            {busy === "simulator" ? "Running..." : "Run simulated transcript"}
+            {busy === "simulator" ? "🎬 Running..." : "🎬 Run simulated transcript"}
           </button>
           <button
             type="button"
@@ -439,7 +439,7 @@ export function AuditPanel({
             onClick={sendTelegramTest}
             className="rounded-lg border border-[#FFB380] bg-white px-3 py-1.5 text-sm font-medium text-[#E65C00] hover:bg-[#FFB380]/20 disabled:opacity-50"
           >
-            {busy === "telegram" ? "Sending..." : "Send Telegram test"}
+            {busy === "telegram" ? "✈️ Sending..." : "✈️ Send Telegram test"}
           </button>
           <button
             type="button"
@@ -447,7 +447,7 @@ export function AuditPanel({
             onClick={resetDemo}
             className="rounded-lg border border-[#E5E7EB] bg-white px-3 py-1.5 text-sm font-medium text-[#4B5563] hover:bg-[#F7F4EB] disabled:opacity-50"
           >
-            {busy === "reset" ? "Resetting..." : "Reset demo state"}
+            {busy === "reset" ? "🧹 Resetting..." : "🧹 Reset demo state"}
           </button>
           <div className="ml-auto flex items-center gap-2">
             <span
@@ -472,7 +472,7 @@ export function AuditPanel({
         <ToastStack toasts={toasts} />
       </div>
 
-      <SectionCard title="Call status">
+      <SectionCard title="📞 Call status">
         <div className="flex flex-wrap items-center gap-2">
           <span
             className={`rounded-full border px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-wider font-semibold ${
@@ -498,7 +498,7 @@ export function AuditPanel({
         </div>
       </SectionCard>
 
-      <SectionCard title="Live transcript">
+      <SectionCard title="💬 Live transcript">
         {state.chunks.length === 0 ? (
           <EmptyState text="No transcript yet. Start a real call or run the simulator to see chunks stream in." />
         ) : (
@@ -521,7 +521,7 @@ export function AuditPanel({
         )}
       </SectionCard>
 
-      <SectionCard title="Rule evaluations">
+      <SectionCard title="🔍 Rule evaluations">
         {state.chunks.length === 0 ? (
           <EmptyState text="Rule checks appear here as each transcript chunk arrives." />
         ) : (
@@ -562,7 +562,7 @@ export function AuditPanel({
         )}
       </SectionCard>
 
-      <SectionCard title="Fired trigger events">
+      <SectionCard title="🚨 Fired trigger events">
         {state.triggerEvents.length === 0 ? (
           <EmptyState
             text={`No triggers fired yet. Loaded rules: ${rules.length}.`}
@@ -598,14 +598,14 @@ export function AuditPanel({
         )}
       </SectionCard>
 
-      <SectionCard title="Telegram delivery">
+      <SectionCard title="✈️ Telegram delivery">
         <DeliveryList
           attempts={state.deliveries.filter((d) => d.channel === "telegram")}
           emptyText="No Telegram alerts sent yet."
         />
       </SectionCard>
 
-      <SectionCard title="SMS delivery">
+      <SectionCard title="📱 SMS delivery">
         <DeliveryList
           attempts={state.deliveries.filter((d) => d.channel === "sms")}
           emptyText="No SMS alerts sent yet. Preview-only attempts render as gray badges."
@@ -615,7 +615,7 @@ export function AuditPanel({
       <HandoffResources triggerEvents={state.triggerEvents} />
 
       <div className={`rounded-2xl transition-colors duration-300${memoryPulse ? " bg-[#FFB380]/30" : ""}`}>
-      <SectionCard title="Memory summary">
+      <SectionCard title="🧠 Memory summary">
         {state.memory ? (
           <div className="space-y-1">
             <p className="text-sm text-[#111827] whitespace-pre-wrap">

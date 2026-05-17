@@ -93,7 +93,7 @@ export function ConfigPanel({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Section title="Elder">
+      <Section title="👵 Elder">
         <Field label="Elder name" htmlFor="elder_name">
           <input
             id="elder_name"
@@ -120,7 +120,7 @@ export function ConfigPanel({
         </Field>
       </Section>
 
-      <Section title="Family">
+      <Section title="👨‍👩‍👧 Family">
         <Field label="Family contact name" htmlFor="family_name">
           <input
             id="family_name"
@@ -135,7 +135,7 @@ export function ConfigPanel({
         </Field>
       </Section>
 
-      <Section title="Telegram">
+      <Section title="✈️ Telegram">
         <Field label="Bot token" htmlFor="telegram_bot_token">
           <input
             id="telegram_bot_token"
@@ -162,7 +162,7 @@ export function ConfigPanel({
         </Field>
       </Section>
 
-      <Section title="SMS">
+      <Section title="📱 SMS">
         <Field
           label="SMS recipients (one phone per line)"
           htmlFor="sms_recipients"
@@ -187,7 +187,7 @@ export function ConfigPanel({
         </Field>
       </Section>
 
-      <Section title="Schedule">
+      <Section title="🗓️ Schedule">
         <Field
           label="Daily call time (SGT)"
           htmlFor="daily_call_time_sgt"
@@ -220,7 +220,7 @@ export function ConfigPanel({
         </label>
       </Section>
 
-      <Section title="Service status">
+      <Section title="🩺 Service status">
         <ServiceStatusList status={serviceStatus} />
       </Section>
 

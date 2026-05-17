@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     to = first ? first.trim() : "";
   }
 
-  const message = `Call-Check-Loop SMS test at ${formatSgt(nowSgtISO())}.`;
+  const message = `Nurse Joy SMS test at ${formatSgt(nowSgtISO())}.`;
 
   if (!serviceStatus().twilioSms.configured) {
     return NextResponse.json(

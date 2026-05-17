@@ -61,14 +61,14 @@ export default async function Home() {
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-5xl font-medium leading-[1.04] tracking-tight text-[#111827]">
-            Call-Check-Loop
+            Nurse Joy <span aria-hidden>👩‍⚕️🌸</span>
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-[#4B5563]">
-            One-screen control room for daily elder voice check-ins. Configure
-            on the left, watch the call audit unfold on the right.
+            🏥 One-screen nurse station for daily elder voice check-ins.
+            Configure on the left, watch the call audit unfold on the right.
           </p>
           <p className="mt-2 max-w-2xl text-sm font-medium text-[#E65C00]">
-            The key is not just that it alerts. The family can see exactly why.
+            🛎️ The key is not just that it alerts. The family can see exactly why.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

@@ -235,7 +235,7 @@ export function RulesEditor({ initialRules }: { initialRules: TriggerRule[] }) {
     <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EB] p-6 shadow-sm">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h3 className="font-mono text-xs font-semibold uppercase tracking-wide text-[#4B5563]">
-          Trigger rules
+          🩹 Trigger rules
         </h3>
         <div className="flex items-center gap-2">
           <button
