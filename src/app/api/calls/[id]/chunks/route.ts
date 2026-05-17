@@ -4,6 +4,8 @@
 // VOL-144 trigger pipeline. Next.js 16 — params is async, must be awaited.
 import { NextResponse } from "next/server";
 import { processIncomingChunk } from "@/lib/pipeline/processChunk";
+import { dispatchPendingTelegram } from "@/lib/telegram/dispatcher";
+import { dispatchPendingSms } from "@/lib/sms/dispatcher";
 import type { ChunkSpeaker } from "@/lib/types";
 
 interface ChunkPostBody {
@@ -66,7 +68,20 @@ export async function POST(
       sequence: body.sequence,
     });
 
-    return NextResponse.json({ ok: true, ...result }, { status: 200 });
+    // Drain pending Telegram + SMS deliveries this chunk produced.
+    let telegram = { attempted: 0, sent: 0, failed: 0 };
+    let sms = { attempted: 0, sent: 0, failed: 0, previewed: 0 };
+    if (result.triggerEvents.length > 0) {
+      [telegram, sms] = await Promise.all([
+        dispatchPendingTelegram({ callId }).catch(() => telegram),
+        dispatchPendingSms({ callId }).catch(() => sms),
+      ]);
+    }
+
+    return NextResponse.json(
+      { ok: true, ...result, deliveries: { telegram, sms } },
+      { status: 200 },
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
