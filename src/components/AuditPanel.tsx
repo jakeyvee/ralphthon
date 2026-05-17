@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatSgt, nowSgtISO } from "@/lib/sgt";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import { HandoffResources } from "@/components/HandoffResources";
@@ -72,6 +72,17 @@ const DELIVERY_TONE: Record<DeliveryAttempt["status"], string> = {
   preview: "bg-zinc-100 text-zinc-600 border-zinc-200",
 };
 
+// VOL-161: tiny short-form relative time for "updated Xs ago" hint.
+function relativeTimeShort(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return formatSgt(iso);
+  const diffSec = Math.max(0, Math.floor((Date.now() - t) / 1000));
+  if (diffSec < 5) return "just now";
+  if (diffSec < 60) return `${diffSec}s ago`;
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+  return formatSgt(iso);
+}
+
 export function AuditPanel({
   rules,
   serviceStatus,
@@ -110,6 +121,39 @@ export function AuditPanel({
       .catch(() => {});
     return () => { cancelled = true; };
   }, [state.memory]);
+
+  // VOL-161: flash the memory card briefly when its updated_at_sgt changes.
+  const [memoryPulse, setMemoryPulse] = useState(false);
+  const lastMemoryStamp = useRef<string | null>(state.memory?.updated_at_sgt ?? null);
+  useEffect(() => {
+    const next = state.memory?.updated_at_sgt ?? null;
+    if (!next || next === lastMemoryStamp.current) return;
+    lastMemoryStamp.current = next;
+    setMemoryPulse(true);
+    const id = setTimeout(() => setMemoryPulse(false), 1500);
+    return () => clearTimeout(id);
+  }, [state.memory?.updated_at_sgt]);
+
+  // VOL-161: when new trigger events land, refetch memory shortly after so
+  // the post-call summary update becomes visible without a page refresh.
+  const prevEventCount = useRef(state.triggerEvents.length);
+  useEffect(() => {
+    const prev = prevEventCount.current;
+    const next = state.triggerEvents.length;
+    prevEventCount.current = next;
+    if (next <= prev) return;
+    const id = setTimeout(async () => {
+      try {
+        const r = await fetch("/api/memory");
+        if (!r.ok) return;
+        const data: { memory?: MemorySummary | null } | null = await r
+          .json()
+          .catch(() => null);
+        if (data?.memory) setState((s) => ({ ...s, memory: data.memory! }));
+      } catch {}
+    }, 300);
+    return () => clearTimeout(id);
+  }, [state.triggerEvents.length]);
 
   // VOL-159: on first mount with no active call, hydrate from /api/calls/latest
   // so a refresh mid-call picks up the in-progress row automatically.
@@ -570,6 +614,7 @@ export function AuditPanel({
 
       <HandoffResources triggerEvents={state.triggerEvents} />
 
+      <div className={`rounded-2xl transition-colors duration-300${memoryPulse ? " bg-emerald-50" : ""}`}>
       <SectionCard title="Memory summary">
         {state.memory ? (
           <div className="space-y-1">
@@ -579,11 +624,15 @@ export function AuditPanel({
             <p className="text-xs text-zinc-500">
               Updated {formatSgt(state.memory.updated_at_sgt)}
             </p>
+            <p className="mt-2 text-xs text-zinc-500">
+              updated {relativeTimeShort(state.memory.updated_at_sgt)}
+            </p>
           </div>
         ) : (
           <EmptyState text="No prior calls yet." />
         )}
       </SectionCard>
+      </div>
     </div>
   );
 }
