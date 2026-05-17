@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { processIncomingChunk } from "@/lib/pipeline/processChunk";
 import { dispatchPendingTelegram } from "@/lib/telegram/dispatcher";
 import { dispatchPendingSms } from "@/lib/sms/dispatcher";
+import { updateMemoryForElder } from "@/lib/memory/updater";
 import type { ChunkSpeaker } from "@/lib/types";
 
 interface ChunkPostBody {
@@ -68,7 +69,8 @@ export async function POST(
       sequence: body.sequence,
     });
 
-    // Drain pending Telegram + SMS deliveries this chunk produced.
+    // Drain pending Telegram + SMS deliveries this chunk produced,
+    // and refresh longitudinal memory in the same request.
     let telegram = { attempted: 0, sent: 0, failed: 0 };
     let sms = { attempted: 0, sent: 0, failed: 0, previewed: 0 };
     if (result.triggerEvents.length > 0) {
@@ -77,6 +79,7 @@ export async function POST(
         dispatchPendingSms({ callId }).catch(() => sms),
       ]);
     }
+    void updateMemoryForElder().catch(() => undefined);
 
     return NextResponse.json(
       { ok: true, ...result, deliveries: { telegram, sms } },
