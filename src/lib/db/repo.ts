@@ -712,4 +712,7 @@ export async function resetDemoData(): Promise<void> {
   await supabase.from("rule_evaluations").delete().neq("id", "00000000-0000-0000-0000-000000000000");
   await supabase.from("transcript_chunks").delete().neq("id", "00000000-0000-0000-0000-000000000000");
   await supabase.from("calls").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  // VOL-160: also clear memory summaries so the Reset button truly returns
+  // the demo to first-run state. `elder_config` and `rules` survive.
+  await supabase.from("memory_summaries").delete().neq("elder_id", "00000000-0000-0000-0000-000000000000");
 }
