@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --test --import tsx src/lib/scanner/scanner.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.4",
@@ -20,6 +21,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",
+    "tsx": "^4.22.1",
     "typescript": "^5"
   }
 }
