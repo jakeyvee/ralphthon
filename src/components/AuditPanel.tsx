@@ -89,6 +89,20 @@ export function AuditPanel({
     }, 5000);
   }, []);
 
+  // VOL-154: hydrate memory summary on mount when not provided server-side.
+  useEffect(() => {
+    if (state.memory) return;
+    let cancelled = false;
+    fetch("/api/memory")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { memory?: MemorySummary | null } | null) => {
+        if (cancelled || !data?.memory) return;
+        setState((s) => (s.memory ? s : { ...s, memory: data.memory! }));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [state.memory]);
+
   // Realtime subscription (best-effort)
   useEffect(() => {
     const client = getBrowserSupabase();
