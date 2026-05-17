@@ -6,11 +6,11 @@
 // + repo writes inline if that endpoint isn't merged yet.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { env } from "@/lib/env";
 import {
   appendChunk,
   createCall,
   listRules,
+  recordDelivery,
   recordEvaluation,
   recordTriggerEvent,
   updateCallStatus,
@@ -18,6 +18,8 @@ import {
 import { scanChunk } from "@/lib/scanner/scanner";
 import { nowSgtISO } from "@/lib/sgt";
 import { SCRIPTED_CHUNKS } from "@/lib/simulator/scriptedChunks";
+import { dispatchPendingTelegram } from "@/lib/telegram/dispatcher";
+import { dispatchPendingSms } from "@/lib/sms/dispatcher";
 import type { TranscriptChunk, TriggerRule } from "@/lib/types";
 
 // Force the Node runtime so we can use setTimeout-based pacing and direct
@@ -44,8 +46,9 @@ async function runInlineFallback(
   callId: string,
   chunkRecord: TranscriptChunk,
   rules: TriggerRule[],
-): Promise<void> {
+): Promise<{ firedAny: boolean }> {
   const evaluations = scanChunk(chunkRecord, rules);
+  let firedAny = false;
   for (const evaluation of evaluations) {
     await recordEvaluation({
       chunk_id: chunkRecord.id,
@@ -56,7 +59,8 @@ async function runInlineFallback(
     if (evaluation.matched) {
       const rule = rules.find((r) => r.id === evaluation.rule_id);
       const matchedText = evaluation.matched_text ?? "";
-      await recordTriggerEvent({
+      const eventTimestamp = nowSgtISO();
+      const inserted = await recordTriggerEvent({
         call_id: callId,
         chunk_id: chunkRecord.id,
         rule_id: evaluation.rule_id,
@@ -65,10 +69,28 @@ async function runInlineFallback(
         context_excerpt: buildContextExcerpt(chunkRecord.text, matchedText),
         recommended_action:
           rule?.recommended_action ?? "Review the matched trigger.",
-        timestamp_sgt: nowSgtISO(),
+        timestamp_sgt: eventTimestamp,
       });
+      // Mirror what the VOL-144 pipeline does: queue pending Telegram + SMS
+      // deliveries so the dispatchers downstream have rows to drain.
+      if (inserted?.id) {
+        await recordDelivery({
+          trigger_event_id: inserted.id,
+          channel: "telegram",
+          status: "pending",
+          timestamp_sgt: eventTimestamp,
+        });
+        await recordDelivery({
+          trigger_event_id: inserted.id,
+          channel: "sms",
+          status: "pending",
+          timestamp_sgt: eventTimestamp,
+        });
+      }
+      firedAny = true;
     }
   }
+  return { firedAny };
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -93,9 +115,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // authoritative snapshot for the run.
   const rules = await listRules();
 
-  // Decide pipeline base URL. Prefer the explicit public URL; fall back to
-  // the incoming request's origin so dev/preview deployments Just Work.
-  const baseUrl = env.publicAppUrl ?? request.nextUrl.origin;
+  // Self-loopback must always go to localhost. If we used the public tunnel
+  // URL (env.publicAppUrl), the server would call out through Cloudflare and
+  // back, which adds latency and frequently fails on quick tunnels — causing
+  // the simulator to drop to the inline fallback and skip dispatcher wiring.
+  const loopbackPort = process.env.PORT ?? "3000";
+  const baseUrl = `http://127.0.0.1:${loopbackPort}`;
   const pipelineUrl = (id: string) => `${baseUrl}/api/calls/${id}/chunks`;
 
   let pipelineAvailable = true;
@@ -164,7 +189,29 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     await updateCallStatus(callId, "completed", nowSgtISO());
 
-    return NextResponse.json({ ok: true, callId, chunkCount });
+    // Drain any pending Telegram + SMS deliveries this run produced. The
+    // pipeline route already calls these per-chunk; the inline fallback path
+    // does not — this final sweep covers both cases.
+    const [telegramResult, smsResult] = await Promise.all([
+      dispatchPendingTelegram({ callId }).catch(() => ({
+        attempted: 0,
+        sent: 0,
+        failed: 0,
+      })),
+      dispatchPendingSms({ callId }).catch(() => ({
+        attempted: 0,
+        sent: 0,
+        failed: 0,
+        previewed: 0,
+      })),
+    ]);
+
+    return NextResponse.json({
+      ok: true,
+      callId,
+      chunkCount,
+      deliveries: { telegram: telegramResult, sms: smsResult },
+    });
   } catch (err) {
     // Best-effort: mark the call failed so the UI doesn't show it as in-progress forever.
     try {
