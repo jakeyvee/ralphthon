@@ -85,6 +85,9 @@ export function AuditPanel({
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [busy, setBusy] = useState<ControlKey | null>(null);
   const [realtimeOn, setRealtimeOn] = useState(false);
+  // VOL-160: dedicated banner for the Reset action (separate from the
+  // generic ToastStack so the success message stays visible for ~3s).
+  const [toast, setToast] = useState<string | null>(null);
 
   const pushToast = useCallback((tone: Toast["tone"], text: string) => {
     const id = Date.now() + Math.random();
@@ -316,13 +319,31 @@ export function AuditPanel({
   }
 
   async function resetDemo() {
-    if (!window.confirm("Reset all demo state? This cannot be undone.")) return;
-    await callApi(
-      "reset",
-      "/api/admin/reset",
-      "Reset endpoint not wired (VOL-152)",
-    );
-    setState(EMPTY_INITIAL);
+    if (
+      !window.confirm(
+        "Reset demo state? This wipes all transcript runs, events, deliveries, handoffs, and memory.",
+      )
+    )
+      return;
+    setBusy("reset");
+    try {
+      const res = await fetch("/api/admin/reset", { method: "POST" });
+      const json = await res.json().catch(() => ({}) as Record<string, unknown>);
+      if (json?.ok ?? res.ok) {
+        setState(() => ({ ...EMPTY_INITIAL }));
+        setToast("Demo state reset");
+        setTimeout(() => setToast(null), 3000);
+      } else {
+        setToast("Reset failed — see console");
+        setTimeout(() => setToast(null), 4000);
+      }
+    } catch (err) {
+      console.error("reset demo failed", err);
+      setToast("Reset failed — see console");
+      setTimeout(() => setToast(null), 4000);
+    } finally {
+      setBusy(null);
+    }
   }
 
   function markHandoffLocally(resourceName: string) {
@@ -345,6 +366,11 @@ export function AuditPanel({
     <div className="space-y-4">
       {/* Controls bar */}
       <div className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm">
+        {toast ? (
+          <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+            {toast}
+          </div>
+        ) : null}
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
