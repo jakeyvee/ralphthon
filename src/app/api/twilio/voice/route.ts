@@ -49,8 +49,19 @@ export async function GET(request: NextRequest) {
 
   const status = serviceStatus();
 
-  // Happy path: hand the call to ElevenLabs ConversationRelay.
-  if (status.elevenlabs.configured && env.elevenlabs.agentId) {
+  // ElevenLabs ConversationRelay path is gated behind an opt-in flag because
+  // it requires extra ElevenLabs dashboard setup (Twilio phone integration,
+  // signed WebSocket URLs, agent allowlisting). When that handshake fails
+  // Twilio plays "your application has an error", which kills a demo.
+  // Default path is the Polly + Gather fallback below, which is reliable.
+  const useConversationRelay =
+    process.env.ELEVENLABS_CONVERSATION_RELAY === "true";
+
+  if (
+    useConversationRelay &&
+    status.elevenlabs.configured &&
+    env.elevenlabs.agentId
+  ) {
     const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${encodeURIComponent(
       env.elevenlabs.agentId,
     )}`;
