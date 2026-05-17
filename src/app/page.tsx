@@ -1,4 +1,5 @@
 import { ConfigPanel } from "@/components/ConfigPanel";
+import { RulesEditor } from "@/components/RulesEditor";
 import { AuditPanel, type AuditPanelInitial } from "@/components/AuditPanel";
 import { FALLBACK_PRESET_RULES } from "@/components/fallback-rules";
 import { serviceStatus } from "@/lib/env";
@@ -78,6 +79,7 @@ export default async function Home() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,_22rem)_minmax(0,_1fr)]">
         <aside className="space-y-4">
           <ConfigPanel initialConfig={config} serviceStatus={status} />
+          <RulesEditor initialRules={rules} />
         </aside>
         <section>
           <AuditPanel
