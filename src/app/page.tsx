@@ -2,11 +2,13 @@ import { ConfigPanel } from "@/components/ConfigPanel";
 import { RulesEditor } from "@/components/RulesEditor";
 import { AuditPanel, type AuditPanelInitial } from "@/components/AuditPanel";
 import { FALLBACK_PRESET_RULES } from "@/components/fallback-rules";
+import { RealDeploymentPanel } from "@/components/RealDeploymentPanel";
 import { serviceStatus } from "@/lib/env";
 import type { ElderConfig, TriggerRule } from "@/lib/types";
 import { getOrCreateElderConfig, listRules } from "@/lib/db/repo";
 import { pingDb } from "@/lib/db/health";
 import { PRESET_RULES } from "@/lib/rules/preset";
+import { computeReadiness, type Readiness } from "@/lib/deployment/readiness";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +18,12 @@ type LoadResult = {
   audit: AuditPanelInitial | undefined;
   dbReady: boolean;
   rulesSource: "db" | "preset" | "fallback";
+  readiness: Readiness;
 };
 
 async function loadInitialState(): Promise<LoadResult> {
   const health = await pingDb();
+  const readiness = await computeReadiness();
   if (!health.ok) {
     return {
       config: null,
@@ -27,6 +31,7 @@ async function loadInitialState(): Promise<LoadResult> {
       audit: undefined,
       dbReady: false,
       rulesSource: PRESET_RULES.length ? "preset" : "fallback",
+      readiness,
     };
   }
 
@@ -42,12 +47,13 @@ async function loadInitialState(): Promise<LoadResult> {
     audit: undefined,
     dbReady: true,
     rulesSource: dbRules.length ? "db" : "preset",
+    readiness,
   };
 }
 
 export default async function Home() {
   const status = serviceStatus();
-  const { config, rules, audit, dbReady, rulesSource } =
+  const { config, rules, audit, dbReady, rulesSource, readiness } =
     await loadInitialState();
 
   return (
@@ -80,6 +86,7 @@ export default async function Home() {
         <aside className="space-y-4">
           <ConfigPanel initialConfig={config} serviceStatus={status} />
           <RulesEditor initialRules={rules} />
+          <RealDeploymentPanel initialReadiness={readiness} elderName={config?.elder_name ?? ""} />
         </aside>
         <section>
           <AuditPanel
