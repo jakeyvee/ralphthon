@@ -49,3 +49,9 @@ npm start        # next start
 - Ticket branches use the `gitBranchName` Linear provides (e.g. `shayn-shin/vol-141-...`).
 - One ticket per worktree, commit + push to remote branch.
 - Maintainer merges to `main` locally and resolves conflicts.
+
+## Realtime + polling
+
+`AuditPanel` uses **both** paths:
+- Supabase Realtime subscription on `calls`, `transcript_chunks`, `rule_evaluations`, `trigger_events`, `delivery_attempts`, `handoff_actions`, `memory_summaries` (publication enabled via migration `20260517064425_enable_realtime_publication.sql`).
+- 1.5s polling fallback against `/api/calls/[id]/audit` (or `/api/calls/latest` if no active call yet), so the panel stays accurate even if Realtime silently no-ops under RLS.
