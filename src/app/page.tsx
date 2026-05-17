@@ -3,6 +3,9 @@ import { AuditPanel, type AuditPanelInitial } from "@/components/AuditPanel";
 import { FALLBACK_PRESET_RULES } from "@/components/fallback-rules";
 import { serviceStatus } from "@/lib/env";
 import type { ElderConfig, TriggerRule } from "@/lib/types";
+import { getOrCreateElderConfig, listRules } from "@/lib/db/repo";
+import { pingDb } from "@/lib/db/health";
+import { PRESET_RULES } from "@/lib/rules/preset";
 
 export const dynamic = "force-dynamic";
 
@@ -11,25 +14,34 @@ type LoadResult = {
   rules: TriggerRule[];
   audit: AuditPanelInitial | undefined;
   dbReady: boolean;
-  rulesSource: "preset" | "fallback";
+  rulesSource: "db" | "preset" | "fallback";
 };
 
-/**
- * Server-side state load. Intentionally minimal for VOL-141:
- *  - DB persistence ships in VOL-149 (`@/lib/db/repo`). Until then we render
- *    with empty state and show a "DB not ready" badge.
- *  - Preset rules ship in VOL-142 (`@/lib/rules/preset`). We fall back to the
- *    hard-coded 6-rule list in `src/components/fallback-rules.ts`.
- *
- * When those modules land, swap the no-op below for real `await import(...)`
- * calls (guarded by try/catch).
- */
 async function loadInitialState(): Promise<LoadResult> {
-  const config: Omit<ElderConfig, "id"> | null = null;
-  const rules: TriggerRule[] = FALLBACK_PRESET_RULES;
-  const rulesSource: "preset" | "fallback" = "fallback";
-  const dbReady = false;
-  return { config, rules, audit: undefined, dbReady, rulesSource };
+  const health = await pingDb();
+  if (!health.ok) {
+    return {
+      config: null,
+      rules: PRESET_RULES.length ? PRESET_RULES : FALLBACK_PRESET_RULES,
+      audit: undefined,
+      dbReady: false,
+      rulesSource: PRESET_RULES.length ? "preset" : "fallback",
+    };
+  }
+
+  const [config, dbRules] = await Promise.all([
+    getOrCreateElderConfig().catch(() => null),
+    listRules().catch(() => [] as TriggerRule[]),
+  ]);
+
+  const rules = dbRules.length ? dbRules : PRESET_RULES;
+  return {
+    config,
+    rules,
+    audit: undefined,
+    dbReady: true,
+    rulesSource: dbRules.length ? "db" : "preset",
+  };
 }
 
 export default async function Home() {
@@ -56,8 +68,8 @@ export default async function Home() {
             warnText="DB not ready"
           />
           <StatusBadge
-            ok={rulesSource === "preset"}
-            okText="Preset rules loaded"
+            ok={rulesSource !== "fallback"}
+            okText={rulesSource === "db" ? "Rules from DB" : "Preset rules loaded"}
             warnText="Using fallback rules"
           />
         </div>

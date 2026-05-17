@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import type { ElderConfig } from "@/lib/types";
+import { updateElderConfig } from "@/lib/db/repo";
 
 const ConfigSchema = z.object({
   elder_name: z.string().min(1, "Elder name is required").max(120),
@@ -62,9 +63,6 @@ export async function saveConfig(formData: FormData): Promise<SaveConfigResult> 
     consent_acknowledged: parsed.data.consent_acknowledged === "on",
   };
 
-  // TODO(VOL-149): once `@/lib/db/repo` exists, wire `updateElderConfig(cfg)`
-  // here and set `persisted: true`.
-  const persisted = false;
-
-  return { ok: true, persisted, config: cfg };
+  const saved = await updateElderConfig(cfg).catch(() => null);
+  return { ok: true, persisted: saved !== null, config: cfg };
 }
