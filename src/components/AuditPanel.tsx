@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { formatSgt, nowSgtISO } from "@/lib/sgt";
 import { getBrowserSupabase } from "@/lib/supabase/client";
+import { HandoffResources } from "@/components/HandoffResources";
 import type { ServiceStatusMap } from "@/lib/env";
 import type {
   CallSource,
@@ -414,32 +415,7 @@ export function AuditPanel({
         />
       </SectionCard>
 
-      <SectionCard title="AIC / SAGE handoff resources">
-        <p className="mb-3 text-xs text-zinc-500">
-          These are informational pointers, not automated referrals.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <HandoffCard
-            name="AIC — Agency for Integrated Care"
-            purpose="Care navigation, eldercare services, and caregiver support in Singapore."
-            onMark={() => markHandoffLocally("AIC")}
-          />
-          <HandoffCard
-            name="SAGE — Seniors Helpline"
-            purpose="Listening line and emotional support for seniors and their families."
-            onMark={() => markHandoffLocally("SAGE")}
-          />
-        </div>
-        {state.handoffs.length > 0 ? (
-          <ul className="mt-4 space-y-1 text-xs text-zinc-600">
-            {state.handoffs.map((h) => (
-              <li key={h.id}>
-                {formatSgt(h.timestamp_sgt)} — considered {h.resource_name}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </SectionCard>
+      <HandoffResources triggerEvents={state.triggerEvents} />
 
       <SectionCard title="Memory summary">
         {state.memory ? (
