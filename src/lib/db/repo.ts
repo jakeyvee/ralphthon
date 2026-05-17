@@ -316,9 +316,9 @@ export async function getOrCreateElderConfig(): Promise<ElderConfig | null> {
   if (existing.data) return mapElder(existing.data);
 
   const defaults = {
-    elder_name: "",
+    elder_name: "Auntie",
     elder_phone: "",
-    family_name: "",
+    family_name: "Marcus",
     telegram_bot_token: null,
     telegram_chat_id: null,
     sms_recipients: [] as string[],
