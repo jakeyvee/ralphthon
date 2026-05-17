@@ -26,51 +26,56 @@ test("acceptance: 'didn't sleep' + 'back was hurting' matches did_not_sleep and 
   // All rules are returned, matched or not.
   assert.equal(evals.length, PRESET_RULES.length);
 
-  const byName = new Map(evals.map((e) => [e.rule_name, e]));
+  const byId = new Map(evals.map((e) => [e.rule_id, e]));
 
-  const sleep = byName.get("did_not_sleep");
+  const sleep = byId.get("did_not_sleep");
   assert.ok(sleep, "did_not_sleep eval present");
   assert.equal(sleep.matched, true);
   assert.equal(sleep.matched_text?.toLowerCase(), "didn't sleep");
 
-  const pain = byName.get("pain");
+  const pain = byId.get("pain");
   assert.ok(pain, "pain eval present");
   assert.equal(pain.matched, true);
-  assert.equal(pain.matched_text?.toLowerCase(), "back was hurting");
+  assert.equal(pain.matched_text?.toLowerCase(), "hurting");
 
   // Other rules should be present with matched=false and no matched_text.
-  for (const name of ["fall_or_dizzy", "not_eating", "loneliness", "medication_issue"]) {
-    const e = byName.get(name);
-    assert.ok(e, `${name} eval present`);
-    assert.equal(e.matched, false, `${name} should not match`);
-    assert.equal(e.matched_text, undefined, `${name} should not have matched_text`);
+  for (const id of ["fall", "dizzy", "did_not_eat", "lonely"]) {
+    const e = byId.get(id);
+    assert.ok(e, `${id} eval present`);
+    assert.equal(e.matched, false, `${id} should not match`);
+    assert.equal(e.matched_text, undefined, `${id} should not have matched_text`);
   }
 });
 
 test("case-insensitive matching", () => {
-  const c = chunk("I FELL DOWN this morning and feel DIZZY.");
+  const c = chunk("I FELL this morning and feel DIZZY.");
   const evals = scanChunk(c, PRESET_RULES);
-  const fall = evals.find((e) => e.rule_name === "fall_or_dizzy");
+  const fall = evals.find((e) => e.rule_id === "fall");
   assert.ok(fall);
   assert.equal(fall.matched, true);
   assert.ok(
-    fall.matched_text && /fell down|i fell|dizzy/i.test(fall.matched_text),
-    `expected a fall/dizzy phrase, got ${fall.matched_text}`,
+    fall.matched_text && /fell|fall down|slipped|tripped/i.test(fall.matched_text),
+    `expected a fall phrase, got ${fall.matched_text}`,
   );
   // matched_text preserves original casing from the chunk text.
   assert.equal(fall.matched_text, fall.matched_text?.toUpperCase());
+
+  const dizzy = evals.find((e) => e.rule_id === "dizzy");
+  assert.ok(dizzy);
+  assert.equal(dizzy.matched, true);
+  assert.equal(dizzy.matched_text?.toLowerCase(), "dizzy");
 });
 
 test("multiple rules can match within one chunk", () => {
   const c = chunk(
-    "I haven't eaten all day, I feel lonely, and I ran out of my pills.",
+    "I didn't eat all day, I feel lonely, and my back hurts.",
   );
   const evals = scanChunk(c, PRESET_RULES);
-  const matched = evals.filter((e) => e.matched).map((e) => e.rule_name).sort();
+  const matched = evals.filter((e) => e.matched).map((e) => e.rule_id).sort();
   assert.deepEqual(matched, [
-    "loneliness",
-    "medication_issue",
-    "not_eating",
+    "did_not_eat",
+    "lonely",
+    "pain",
   ]);
 });
 
@@ -110,7 +115,7 @@ test("regex special characters in patterns are escaped (no ReDoS / no regex inje
 
 test("disabled rules never match", () => {
   const off: TriggerRule = {
-    ...PRESET_RULES.find((r) => r.name === "pain")!,
+    ...PRESET_RULES.find((r) => r.id === "pain")!,
     enabled: false,
   };
   const c = chunk("my back was hurting badly");
@@ -120,15 +125,14 @@ test("disabled rules never match", () => {
 });
 
 test("word-boundary tolerance: substring inside another word does not match", () => {
-  // "hurting" is a preset 'pain' pattern but as a standalone word.
-  // Inside the word "unhurting"... well, that's not a real word; use 'painful'
-  // which contains 'pain' as a substring but no preset pattern is bare 'pain'.
-  // Test instead: 'painting' should NOT trigger pain (no bare 'pain' pattern),
-  // and 'no sleep' should NOT trigger inside 'snowsleeping' style concatenations.
+  // 'painting' contains 'pain' but the word-boundary check should still
+  // permit matching because 'pain' is a standalone pattern in the new preset.
+  // However the boundary regex requires non-alphanumeric edges, so 'painting'
+  // should NOT match 'pain' (the 't' after 'pain' violates the right boundary).
   const c1 = chunk("I was painting the wall.");
   const e1 = scanChunk(c1, PRESET_RULES);
   assert.equal(
-    e1.find((e) => e.rule_name === "pain")?.matched,
+    e1.find((e) => e.rule_id === "pain")?.matched,
     false,
     "'painting' must not trigger pain",
   );
@@ -136,7 +140,7 @@ test("word-boundary tolerance: substring inside another word does not match", ()
   // 'hurting' bare word should match.
   const c2 = chunk("my knee is hurting today");
   const e2 = scanChunk(c2, PRESET_RULES);
-  assert.equal(e2.find((e) => e.rule_name === "pain")?.matched, true);
+  assert.equal(e2.find((e) => e.rule_id === "pain")?.matched, true);
 });
 
 test("scanChunks returns per-chunk results in order", () => {
@@ -150,5 +154,5 @@ test("scanChunks returns per-chunk results in order", () => {
   assert.equal(results[1].chunk.id, "b");
   const matchedB = results[1].evaluations.filter((e) => e.matched);
   assert.equal(matchedB.length, 1);
-  assert.equal(matchedB[0].rule_name, "fall_or_dizzy");
+  assert.equal(matchedB[0].rule_id, "dizzy");
 });

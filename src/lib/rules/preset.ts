@@ -1,94 +1,74 @@
-// PRD default trigger rules shipped with the MVP.
+// PRD v0.2 default trigger rules shipped with the MVP.
 // Stable string IDs are used so persistence and UI can reference them safely.
 
 import type { TriggerRule } from "@/lib/types";
 
 export const PRESET_RULES: TriggerRule[] = [
   {
+    id: "pain",
+    name: "Pain",
+    patterns: ["pain", "hurting", "ache", "aching", "sore", "back hurts"],
+    recommended_action:
+      "Call mum today to check the pain and whether she needs help.",
+    enabled: true,
+    is_preset: true,
+  },
+  {
+    id: "fall",
+    name: "Fall",
+    patterns: ["fell", "fall down", "slipped", "tripped"],
+    recommended_action:
+      "Call immediately and confirm whether she is injured.",
+    enabled: true,
+    is_preset: true,
+  },
+  {
+    id: "dizzy",
+    name: "Dizzy",
+    patterns: ["dizzy", "lightheaded", "faint", "almost fainted"],
+    recommended_action:
+      "Call immediately and check if she is safe sitting or lying down.",
+    enabled: true,
+    is_preset: true,
+  },
+  {
+    id: "did_not_eat",
+    name: "Didn't eat",
+    patterns: [
+      "didn't eat",
+      "did not eat",
+      "no appetite",
+      "skipped dinner",
+      "skipped breakfast",
+    ],
+    recommended_action: "Call mum today and check whether she has eaten.",
+    enabled: true,
+    is_preset: true,
+  },
+  {
     id: "did_not_sleep",
-    name: "did_not_sleep",
+    name: "Didn't sleep",
     patterns: [
       "didn't sleep",
       "did not sleep",
-      "no sleep",
       "couldn't sleep",
-      "trouble sleeping",
+      "poor sleep",
+      "awake all night",
     ],
-    recommended_action:
-      "Ask about sleep tonight; check medication and routine.",
+    recommended_action: "Call mum today to check how she is feeling.",
     enabled: true,
     is_preset: true,
   },
   {
-    id: "pain",
-    name: "pain",
+    id: "lonely",
+    name: "Lonely",
     patterns: [
-      "back was hurting",
-      "back hurts",
-      "in pain",
-      "my chest hurts",
-      "headache",
-      "stomach hurts",
-      "hurting",
-    ],
-    recommended_action:
-      "Check pain location and severity; consider clinic visit.",
-    enabled: true,
-    is_preset: true,
-  },
-  {
-    id: "fall_or_dizzy",
-    name: "fall_or_dizzy",
-    patterns: [
-      "fell down",
-      "i fell",
-      "dizzy",
-      "lightheaded",
-      "lost my balance",
-    ],
-    recommended_action:
-      "Check for injury; consider GP/clinic if recent fall.",
-    enabled: true,
-    is_preset: true,
-  },
-  {
-    id: "not_eating",
-    name: "not_eating",
-    patterns: [
-      "haven't eaten",
-      "no appetite",
-      "didn't eat",
-      "skipping meals",
-    ],
-    recommended_action:
-      "Encourage hydration and a light meal; check fridge during next visit.",
-    enabled: true,
-    is_preset: true,
-  },
-  {
-    id: "loneliness",
-    name: "loneliness",
-    patterns: [
-      "feel lonely",
-      "feeling alone",
+      "lonely",
       "no one to talk to",
-      "miss everyone",
+      "alone all day",
+      "very quiet at home",
     ],
-    recommended_action:
-      "Plan a visit or call this week; consider community programs.",
-    enabled: true,
-    is_preset: true,
-  },
-  {
-    id: "medication_issue",
-    name: "medication_issue",
-    patterns: [
-      "ran out of",
-      "forgot to take",
-      "missed my pills",
-      "out of medicine",
-    ],
-    recommended_action: "Refill check; review medication list.",
+    recommended_action: "Call mum today and arrange a family check-in.",
     enabled: true,
     is_preset: true,
   },
