@@ -33,6 +33,10 @@ type CallState = {
 
 export type AuditPanelInitial = {
   call: CallState;
+  // VOL-159: id of the call the panel is currently following. Set when a
+  // button handler kicks off a new call (so we can clear stale state and
+  // bind the polling loop to it before the row is visible via /latest).
+  activeCallId: string | null;
   chunks: TranscriptChunk[];
   evaluations: Record<string, RuleEvaluation[]>; // keyed by chunk_id
   triggerEvents: TriggerEvent[];
@@ -43,6 +47,7 @@ export type AuditPanelInitial = {
 
 const EMPTY_INITIAL: AuditPanelInitial = {
   call: { status: "idle", source: null, call_id: null },
+  activeCallId: null,
   chunks: [],
   evaluations: {},
   triggerEvents: [],
@@ -103,7 +108,26 @@ export function AuditPanel({
     return () => { cancelled = true; };
   }, [state.memory]);
 
+  // VOL-159: on first mount with no active call, hydrate from /api/calls/latest
+  // so a refresh mid-call picks up the in-progress row automatically.
+  useEffect(() => {
+    if (state.activeCallId) return;
+    let cancelled = false;
+    fetch("/api/calls/latest", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { callId?: string | null } | null) => {
+        if (cancelled || !data?.callId) return;
+        setState((s) => (s.activeCallId ? s : { ...s, activeCallId: data.callId! }));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+    // Intentionally only runs on mount; later writes go via button handlers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // VOL-155: polling fallback (Realtime can silently no-op under RLS).
+  // VOL-159: prefer `activeCallId` (set by button handlers / initial hydrate)
+  // and fall back to /api/calls/latest only when nothing is bound yet.
   useEffect(() => {
     let cancelled = false;
     const dedupeById = <T extends { id: string }>(rows: T[]): T[] => {
@@ -112,8 +136,7 @@ export function AuditPanel({
     };
     async function tick() {
       try {
-        const activeId = state.call.call_id;
-        let callId = activeId;
+        let callId: string | null = state.activeCallId;
         if (!callId) {
           const r = await fetch("/api/calls/latest", { cache: "no-store" });
           if (!r.ok) return;
@@ -143,7 +166,7 @@ export function AuditPanel({
     const iv = setInterval(tick, 1500);
     tick();
     return () => { cancelled = true; clearInterval(iv); };
-  }, [state.call.call_id]);
+  }, [state.activeCallId]);
 
   // Realtime subscription (best-effort)
   useEffect(() => {
@@ -191,10 +214,29 @@ export function AuditPanel({
     return missing;
   }, [serviceStatus]);
 
+  // VOL-159: bind the panel to a freshly-created call, clearing stale rows
+  // so the next polling tick only hydrates from the new call's audit bundle.
+  const bindToCall = useCallback(
+    (callId: string, source: CallSource) => {
+      setState((s) => ({
+        ...s,
+        activeCallId: callId,
+        call: { status: "in_progress", source, call_id: callId },
+        chunks: [],
+        evaluations: {},
+        triggerEvents: [],
+        deliveries: [],
+        handoffs: [],
+      }));
+    },
+    [],
+  );
+
   async function callApi(
     key: ControlKey,
     url: string,
     fallbackTicket: string,
+    onSuccess?: (json: Record<string, unknown>) => void,
   ) {
     setBusy(key);
     try {
@@ -214,6 +256,19 @@ export function AuditPanel({
         );
         return;
       }
+      let json: Record<string, unknown> = {};
+      try {
+        json = (await res.json()) as Record<string, unknown>;
+      } catch {
+        json = {};
+      }
+      if (json && json.ok === false) {
+        const errMsg =
+          typeof json.error === "string" ? json.error : "Request rejected.";
+        pushToast("warn", errMsg);
+        return;
+      }
+      onSuccess?.(json);
       pushToast("success", "Request accepted.");
     } catch (err) {
       pushToast(
@@ -233,6 +288,10 @@ export function AuditPanel({
       "real",
       "/api/calls/start",
       "Voice path not wired (VOL-147)",
+      (json) => {
+        const callId = typeof json.callId === "string" ? json.callId : null;
+        if (callId) bindToCall(callId, "real");
+      },
     );
   }
 
@@ -241,6 +300,10 @@ export function AuditPanel({
       "simulator",
       "/api/simulator/run",
       "Simulator not wired (VOL-143)",
+      (json) => {
+        const callId = typeof json.callId === "string" ? json.callId : null;
+        if (callId) bindToCall(callId, "simulator");
+      },
     );
   }
 
@@ -354,6 +417,14 @@ export function AuditPanel({
           <span className="text-xs text-zinc-500">
             call id: {state.call.call_id ?? "—"}
           </span>
+          {state.activeCallId ? (
+            <span
+              className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-mono text-[11px] text-emerald-700"
+              title={`Bound to call ${state.activeCallId}`}
+            >
+              bound: {state.activeCallId.slice(0, 8)}…
+            </span>
+          ) : null}
         </div>
       </SectionCard>
 
