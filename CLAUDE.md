@@ -20,10 +20,14 @@ Shared conventions for worktree agents picking up Linear tickets in this project
 | `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/(*)/`, `src/components/` | **VOL-141** UI shell |
 | `src/lib/db/`, `src/lib/supabase/*` (extensions), Supabase migrations, seeded rules | **VOL-149** DB persistence |
 | `src/lib/scanner/`, `src/lib/rules/` | **VOL-142** rule scanner |
-| `src/app/api/twilio/*`, `src/app/api/elevenlabs/*` | **VOL-147 / VOL-150** |
+| `src/app/api/twilio/*`, `src/app/api/elevenlabs/*`, `src/app/api/calls/start/*` | **VOL-147** Twilio + ElevenLabs voice |
+| `src/app/api/calls/[id]/chunks/*`, `src/lib/pipeline/*` | **VOL-144** trigger event pipeline |
+| `src/app/api/simulator/*`, `src/lib/simulator/*` | **VOL-143** simulator |
+| `src/app/api/rules/*`, `src/components/RulesEditor.tsx` | **VOL-151** editable rules |
 | `src/app/api/telegram/*` | **VOL-145** |
 | `src/app/api/sms/*` | **VOL-146** |
-| Shared: `src/lib/types.ts`, `src/lib/env.ts`, `src/lib/sgt.ts` | **DO NOT rewrite** — extend additively only |
+| `src/app/api/admin/reset/*` | **VOL-149/VOL-148** (reset already wired in repo) |
+| Shared: `src/lib/types.ts`, `src/lib/env.ts`, `src/lib/sgt.ts`, `CLAUDE.md` | **DO NOT rewrite** — extend additively only |
 
 ## Conventions
 
